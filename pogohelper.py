@@ -200,7 +200,7 @@ def received_information(bot, update, user_data):
         return TYPING_REPLY
     elif category == "level":
         if text.isdigit():
-            if int(text) > 0 and int(text) < 40:
+            if int(text) > 0 and int(text) <= 40:
                 update.message.reply_text("Ok! Ecco i dati che conosco:"
                                           "%s"
                                           "Adesso conosco tutti i tuoi dati. Vuoi confermarli o cambiarli?"
