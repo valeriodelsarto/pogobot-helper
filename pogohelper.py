@@ -82,6 +82,7 @@ confirmyesno_reply_keyboard = [['Si'],['No']]
 confirmyesno_markup = ReplyKeyboardMarkup(confirmyesno_reply_keyboard, one_time_keyboard=True)
 
 raid_reply_keyboard = [['Vedi RAID Attivi'],['Crea Nuovo RAID'],
+                      ['Vedi Utenti Registrati'],
                       ['Abilita Notifiche'],['Disabilita Notifiche'],
                       ['Edita Profilo']]
 raid_markup = ReplyKeyboardMarkup(raid_reply_keyboard, one_time_keyboard=True)
@@ -651,6 +652,18 @@ def raid_management(bot, update, job_queue, user_data):
         update.message.reply_text("Ok! Ripetimi i dati del tuo profilo:\n"
                                   "Qual'e' il tuo nickname su Pokemon-Go?")
         return TYPING_REPLY
+    elif text == "Vedi Utenti Registrati":
+        utenti_registrati = "Ecco l'elenco degli utenti registrati:\n"
+        sel = "SELECT NAME,TEAM,LEVEL FROM USERS ORDER BY LEVEL DESC;"
+        conn = sqlite3.connect('pogohelper.db')
+        cursor = conn.execute(sel)
+        for row in cursor:
+            utenti_registrati += row[0]+" Team "+row[1]+" Livello "+row[2]+"\n"
+        conn.close()
+        utenti_registrati = utenti_registrati[:-1]
+        update.message.reply_text(utenti_registrati,
+                                  reply_markup=raid_markup)
+        return RAID
 
 
 def raidedit_management(bot, update, user_data):
@@ -804,6 +817,9 @@ def notify_raids(bot, job):
             ins = "INSERT INTO NOTIFICATIONS (RAIDID,PLAYERID) VALUES (%d, %d);" % (row[0], job.context)
             conn.execute(ins)
             conn.commit()
+    upd = "UPDATE USERS SET HEARTBEAT = datetime('now','localtime') WHERE ID = %d;" % (job.context)
+    conn.execute(upd)
+    conn.commit()
     conn.close()
 
 
@@ -831,7 +847,7 @@ def main():
                                         received_information,
                                         pass_user_data=True),
                            ],
-            RAID: [RegexHandler('^(Vedi RAID Attivi|Crea Nuovo RAID|Abilita Notifiche|Disabilita Notifiche|Edita Profilo)$',
+            RAID: [RegexHandler('^(Vedi RAID Attivi|Crea Nuovo RAID|Vedi Utenti Registrati|Abilita Notifiche|Disabilita Notifiche|Edita Profilo)$',
                                 raid_management,
                                 pass_job_queue=True,
                                 pass_user_data=True),
