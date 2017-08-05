@@ -1,3 +1,12 @@
+# Custom dir/files
+admins.txt
+authorized.json
+blocked.json
+token_id
+pogohelper.db
+raidboss.sourcedata
+log/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

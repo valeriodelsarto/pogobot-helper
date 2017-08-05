@@ -1,0 +1,5 @@
+logfile log/screen-output.%Y%m%d.log
+logfile flush 1
+logtstamp on
+logtstamp after 5
+log on
