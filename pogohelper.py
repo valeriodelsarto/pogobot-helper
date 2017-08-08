@@ -1,5 +1,5 @@
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton, ParseMode)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton, ParseMode, Bot)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler, Job)
 from functools import wraps
@@ -659,7 +659,7 @@ def raid_management(bot, update, job_queue, user_data):
         conn = sqlite3.connect('pogohelper.db')
         cursor = conn.execute(sel)
         for row in cursor:
-            utenti_registrati += row[0]+" Team "+row[1]+" Livello "+row[2]+"\n"
+            utenti_registrati += row[0]+" Team "+row[1]+" Livello "+str(row[2])+"\n"
         conn.close()
         utenti_registrati = utenti_registrati[:-1]
         update.message.reply_text(utenti_registrati,
@@ -855,6 +855,18 @@ def notify_raids(bot, job):
     conn.close()
 
 
+def botShutdown():
+    bot = telegram.Bot(token_id.strip())
+    sel = "SELECT ID FROM USERS WHERE NOTIFICATIONS = 1;"
+    conn = sqlite3.connect('pogohelper.db')
+    cursor = conn.execute(sel)
+    for row in cursor:
+        bot.send_message(row[0], text="Il BOT e' stato riavviato per attivita' di aggiornamento o manutenzione,\n"
+                                      "clicca di nuovo /start per riattivare le notifiche!\n"
+                                      "Grazie per la pazienza!", reply_markup=ReplyKeyboardRemove())
+    conn.close()
+
+
 def main():
     # Create the Updater and pass it your bot's token.
     updater = Updater(token_id.strip())
@@ -934,9 +946,8 @@ def main():
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
-    update.message.reply_text("Il BOT e' stato riavviato per attivita' di aggiornamento o manutenzione,\n"
-                              "clicca di nuovo /start per riattivare le notifiche!\n"
-                              "Grazie per la pazienza!", reply_markup=ReplyKeyboardRemove())
+    # Send shutdown notifications
+    botShutdown()
 
 
 if __name__ == '__main__':
