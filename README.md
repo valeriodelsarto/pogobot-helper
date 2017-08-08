@@ -1,6 +1,6 @@
 # pogobot-helper
 
-pogobot-helper is Pokemon-Go Telegram Bot that helps Players to collaborate and coordinate in order to succesfully accomplish the RAID Battles.
+pogobot-helper is a Telegram Bot that helps Pokémon-Go Players to collaborate and coordinate in order to succesfully accomplish the RAID Battles.
 
 It's written in Python and uses the [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) API.
 It uses a local SQLite database for data persistence.
