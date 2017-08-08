@@ -1,5 +1,5 @@
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton, ParseMode)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler, Job)
 from functools import wraps
@@ -406,6 +406,7 @@ def received_information(bot, update, user_data):
                     tot40 = 0
                     totamici = 0
                     dict_preferred_time = {}
+                    raidready = 0
                     for row in cursor:
                         sel2 = "SELECT NAME,TEAM,LEVEL FROM USERS WHERE ID = %d;" % (row[0])
                         cursor2 = conn.execute(sel2)
@@ -675,11 +676,13 @@ def raidedit_management(bot, update, user_data):
     elif text.isdigit():
         presente = False
         conn = sqlite3.connect('pogohelper.db')
-        sel = "SELECT CREATED_BY,BOSS,LAT,LONG,TIME,GYM FROM RAID WHERE ID = %d;" % (int(text))
+        sel = "SELECT RAID.CREATED_BY,RAID.BOSS,RAID.LAT,RAID.LONG,RAID.TIME,RAID.GYM,RAIDBOSS.STRENGTH \
+               FROM RAID LEFT JOIN RAIDBOSS ON RAID.BOSS = RAIDBOSS.BOSS WHERE ID = %d;" % (int(text))
         cursor = conn.execute(sel)
         for row in cursor:
             presente = True
             user_data['raidexpire'] = row[4]
+            raidbossstrength = float(row[6])
             update.message.reply_text("Ok! Selezionato il RAID numero %d con BOSS %s!"
                                       % (int(text), row[1]),
                                       reply_markup=ReplyKeyboardRemove())
@@ -696,6 +699,7 @@ def raidedit_management(bot, update, user_data):
             tot40 = 0
             totamici = 0
             dict_preferred_time = {}
+            raidteamstrength = 0
             for row in cursor:
                 if row[0] == update.message.chat_id:
                     partecipo = True
@@ -714,6 +718,7 @@ def raidedit_management(bot, update, user_data):
                         totover35 += 1
                     elif row2[2] >= 30:
                         totover30 += 1
+                    raidteamstrength += float(row[2])/30
                         
                     tempo_preferito = str(datetime.strptime(row[2],'%Y-%m-%d %H:%M:%S').strftime('%H:%M'))
                     if row[0] == update.message.chat_id:
@@ -750,6 +755,16 @@ def raidedit_management(bot, update, user_data):
                 for key, value in dict_preferred_time.items():
                     preferred_time += "Ore "+str(key)+" Partecipanti "+str(value)+"\n"
                 preferred_time = preferred_time[:-1]
+                tempo_medio = str(datetime.now().strftime('%H:%M'))
+                sel3 = "SELECT DATETIME(AVG(JULIANDAY(PREFERRED_TIME))) FROM RAIDPLAYERS WHERE RAIDID = %d" % (int(text))
+                cursor3 = conn.execute(sel3)
+                for row3 in cursor3:
+                    tempo_medio = datetime.strptime(row3[0],'%Y-%m-%d %H:%M:%S').strftime('%H:%M')
+                if raidteamstrength > raidbossstrength:
+                    preferred_time += "\n*Partecipano gia' al RAID un numero sufficiente di allenatori per sconfiggere questo BOSS! OTTIMO!*"
+                preferred_time += "\nLa media di tutti i tempi preferiti che sono stati inseriti dai partecipanti al RAID e' %s" % (tempo_medio)
+                if raidteamstrength > raidbossstrength:
+                    preferred_time += ", trovatevi tutti alla posizione indicata all'ora indicata e sconfiggete questo BOSS! Buona fortuna allenatori!"
                 update.message.reply_text("Per ora ci sono %d partecipanti a questo RAID!\n"
                                           "Ci sono %d del team Istinto-Giallo\n"
                                           "Ci sono %d del team Saggezza-Blu\n"
@@ -761,7 +776,7 @@ def raidedit_management(bot, update, user_data):
                                           "%s"
                                           % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, totover30, \
                                           totamici, preferred_time),
-                                          reply_markup=ReplyKeyboardRemove())
+                                          reply_markup=ReplyKeyboardRemove(), parse_mode=ParseMode.MARKDOWN)
                 if partecipo:
                     update.message.reply_text("Partecipi gia' a questo RAID!\n"
                                               "Confermi la tua partecipazione?",
@@ -799,26 +814,43 @@ def delete_old_raids(bot, job):
 
 
 def notify_raids(bot, job):
-    sel = "SELECT RAID.ID,RAID.BOSS,USERS.FIRSTNAME,USERS.SURNAME,USERS.USERNAME,RAID.LAT,RAID.LONG,RAID.TIME \
+    sel = "SELECT RAID.ID,RAID.BOSS,USERS.FIRSTNAME,USERS.SURNAME,USERS.USERNAME,RAID.LAT,RAID.LONG,RAID.TIME,RAID.READY \
            FROM RAID LEFT JOIN USERS ON RAID.CREATED_BY = USERS.ID WHERE RAID.CREATED_BY != %d ORDER BY RAID.ID;" \
            % (job.context)
     conn = sqlite3.connect('pogohelper.db')
     cursor = conn.execute(sel)
     for row in cursor:
+        scadenza = datetime.strptime(row[7],'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M')
         notificato = False
-        sel2 = "SELECT ID FROM NOTIFICATIONS WHERE RAIDID = %d AND PLAYERID = %d;" % (row[0], job.context)
+        sel2 = "SELECT ID,READY FROM NOTIFICATIONS WHERE RAIDID = %d AND PLAYERID = %d;" % (row[0], job.context)
         cursor2 = conn.execute(sel2)
+        raidready = False
+        if row[8] == 1:
+            raidready = True
         for row2 in cursor2:
             notificato = True
+            notificationready = False
+            if row2[1] == 1:
+                notificationready = True
         if not notificato:
-            scadenza = datetime.strptime(row[7],'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M')
             bot.send_message(job.context, text="E' stato creato un nuovo RAID ID %d con BOSS %s e scadenza %s da %s %s @%s, segue posizione:" % (row[0],row[1],scadenza,row[2],row[3],row[4]))
             bot.sendLocation(job.context,row[5],row[6])
             ins = "INSERT INTO NOTIFICATIONS (RAIDID,PLAYERID) VALUES (%d, %d);" % (row[0], job.context)
             conn.execute(ins)
             conn.commit()
-    upd = "UPDATE USERS SET HEARTBEAT = datetime('now','localtime') WHERE ID = %d;" % (job.context)
-    conn.execute(upd)
+        if raidready:
+            if not notificationready:
+                tempo_medio = str(datetime.now().strftime('%H:%M'))
+                sel3 = "SELECT DATETIME(AVG(JULIANDAY(PREFERRED_TIME))) FROM RAIDPLAYERS WHERE RAIDID = %d;" % (row[0])
+                cursor3 = conn.execute(sel3)
+                for row3 in cursor3:
+                    tempo_medio = datetime.strptime(row3[0],'%Y-%m-%d %H:%M:%S').strftime('%H:%M')
+                bot.send_message(job.context, text="E' stato raggiunto il numero minimo di partecipanti necessari a superare il RAID ID %d con BOSS %s e scadenza %s! La media di tutti i tempi preferiti che sono stati inseriti dai partecipanti al RAID e' %s, trovatevi tutti alla posizione indicata all'ora indicata e sconfiggete questo BOSS! Buona fortuna allenatori!" % (row[0],row[1],scadenza,tempo_medio))
+                upd = "UPDATE NOTIFICATIONS SET READY = 1 WHERE RAIDID = %d AND PLAYERID = %d;" % (row[0], job.context)
+                conn.execute(upd)
+                conn.commit()
+    upd1 = "UPDATE USERS SET HEARTBEAT = datetime('now','localtime') WHERE ID = %d;" % (job.context)
+    conn.execute(upd1)
     conn.commit()
     conn.close()
 
@@ -882,6 +914,15 @@ def main():
     # Add restart command
     dp.add_handler(CommandHandler('r', restart))
 
+    # Create notification jobs for each user that has the notification flag on
+    #j = updater.job_queue
+    #sel = "SELECT ID FROM USERS WHERE NOTIFICATIONS = 1"
+    #conn = sqlite3.connect('pogohelper.db')
+    #cursor = conn.execute(sel)
+    #for row in cursor:
+    #    j.run_repeating(notify_raids, 60, context=row[0])
+    #conn.close()
+
     # log all errors
     dp.add_error_handler(error)
 
@@ -892,6 +933,10 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+    update.message.reply_text("Il BOT e' stato riavviato per attivita' di aggiornamento o manutenzione,\n"
+                              "clicca di nuovo /start per riattivare le notifiche!\n"
+                              "Grazie per la pazienza!", reply_markup=ReplyKeyboardRemove())
 
 
 if __name__ == '__main__':
