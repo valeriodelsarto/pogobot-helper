@@ -50,7 +50,7 @@ Want to contribute? Great! [Fork my repo, apply your changes and open me a PR](h
 
 ### Todos
 
- - To be defined!
+ - Add BOT localization to have UI text in any language!
 
 License
 ----
