@@ -76,7 +76,7 @@ for row in cursor:
 conn.close()
 
 # Conversation handler possible status
-TEAM, CONFIRM, CONFIRMYESNO, RAID, RAIDEDIT, RAIDFRIENDS, RAIDPREFERREDTIME, USERLANGUAGE, TYPING_REPLY, TYPING_LOCATION = range(9)
+TEAM, CONFIRM, CONFIRMYESNO, RAID, RAIDEDIT, RAIDFRIENDS, RAIDPREFERREDTIME, USERLANGUAGE, TYPING_REPLY, TYPING_LOCATION = range(10)
 
 # Custom reply keyboards
 team_reply_keyboard = [['Istinto-Giallo'],
