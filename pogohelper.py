@@ -15,6 +15,7 @@ import sys
 import ast
 import re
 
+# Admins that are enabled to restart the bot with /r command
 LIST_OF_ADMINS = []
 fileadmin = open('admins.txt','r')
 temp = fileadmin.read().splitlines()
@@ -22,6 +23,7 @@ fileadmin.close()
 for line in temp:
     LIST_OF_ADMINS.append(int(line))
 
+# Def to build a dynamic reply menu
 def build_menu(buttons,
                n_cols,
                header_buttons=None,
@@ -33,6 +35,7 @@ def build_menu(buttons,
         menu.append(footer_buttons)
     return menu
 
+# Def to return a datetime rounded to a specific delta
 def ceil_dt(dt, delta):
     return dt + (datetime.min - dt) % delta
 
@@ -53,19 +56,29 @@ with open('authorized.json') as data_file:
 with open('blocked.json') as data_file:
     blocked_users = json.load(data_file)
 
-# Load BOSS names
-raidboss = []
 # Open database connection
 conn = sqlite3.connect('pogohelper.db')
+# Load BOSS names
+raidboss = []
 sel = "SELECT DISTINCT(BOSS) FROM RAIDBOSS ORDER BY BOSS;"
 cursor = conn.execute(sel)
 for row in cursor:
     raidboss.append(row[0])
+# Load available languages
+languages = []
+languages_id = []
+sel = "SELECT ID,LANGUAGE FROM LANGUAGES;"
+cursor = conn.execute(sel)
+for row in cursor:
+    languages.append(str(row[1]).lower())
+    languages_id.append(int(row[0]))
 # Close db connection
 conn.close()
 
-TEAM, CONFIRM, CONFIRMYESNO, RAID, RAIDEDIT, RAIDFRIENDS, RAIDPREFERREDTIME, TYPING_REPLY, TYPING_LOCATION = range(9)
+# Conversation handler possible status
+TEAM, CONFIRM, CONFIRMYESNO, RAID, RAIDEDIT, RAIDFRIENDS, RAIDPREFERREDTIME, USERLANGUAGE, TYPING_REPLY, TYPING_LOCATION = range(9)
 
+# Custom reply keyboards
 team_reply_keyboard = [['Istinto-Giallo'],
                       ['Saggezza-Blu'],
                       ['Coraggio-Rosso']]
@@ -102,7 +115,10 @@ raid_friends_reply_keyboard = [['Nessuno'],
                               ['6'],['7'],['8'],['9'],['10']]
 raid_friends_markup = ReplyKeyboardMarkup(raid_friends_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 
+# Default language
+default_language = 1
 
+# Restricted access to some specific command
 def restricted(func):
     @wraps(func)
     def wrapped(bot, update, *args, **kwargs):
@@ -114,12 +130,14 @@ def restricted(func):
     return wrapped
 
 
+# Restart command definition
 @restricted
 def restart(bot, update):
     bot.send_message(update.message.chat_id, "Bot is restarting...")
     time.sleep(0.2)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
+# Convert a list into a multiline string
 def facts_to_str(user_data):
     facts = list()
 
@@ -130,15 +148,16 @@ def facts_to_str(user_data):
     return "\n".join(facts).join(['\n', '\n'])
 
 
+# Start command
 def start(bot, update, job_queue, user_data):
     # Check if user is authorized
     #pprint.pprint(users)
-    #if str(update.message.chat_id) in users:
-    if not str(update.message.chat_id) in blocked_users:
+    #if str(update.message.chat_id) in users: # uses authorized.json
+    if not str(update.message.chat_id) in blocked_users: # uses blocked.json
         # Check if user is already registered in database
         # Open database connection
         conn = sqlite3.connect('pogohelper.db')
-        sel = "SELECT NAME FROM USERS WHERE ID = %d;" % (update.message.chat_id)
+        sel = "SELECT NAME,LANGUAGE FROM USERS WHERE ID = %d;" % (update.message.chat_id)
         cursor = conn.execute(sel)
         present = 0
         for row in cursor:
@@ -147,8 +166,13 @@ def start(bot, update, job_queue, user_data):
         # Close db connection
         conn.close()
 
+        # if a user is already registered
         if present == 1:
-            update.message.reply_text("Bentornato %s!" % (name),
+            default_language = int(row[1])
+            # Load language file
+            with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
+                language = json.load(language_file)
+            update.message.reply_text(language["welcome1"] % (name),
                                       reply_markup=raid_markup)
             sel = "SELECT NOTIFICATIONS FROM USERS WHERE ID = %d;" % (update.message.chat_id)
             conn = sqlite3.connect('pogohelper.db')
@@ -159,10 +183,8 @@ def start(bot, update, job_queue, user_data):
                     user_data['job_notifications'] = job
             conn.close()
             return RAID
-        else:
-            update.message.reply_text(
-                "Ciao! Questo bot e' programmato per aiutare nell'organizzazione di RAID per Pokemon-Go.\n"
-                "Intanto mi servono alcune informazioni. Qual'e' il tuo nickname su Pokemon-Go?")
+        else: # if the user is not already registered
+            update.message.reply_text(language["welcome2"])
 
             return TYPING_REPLY
     else:
@@ -202,13 +224,11 @@ def received_information(bot, update, user_data):
     elif category == "level":
         if text.isdigit():
             if int(text) > 0 and int(text) <= 40:
-                update.message.reply_text("Ok! Ecco i dati che conosco:"
-                                          "%s"
-                                          "Adesso conosco tutti i tuoi dati. Vuoi confermarli o cambiarli?"
-                                          % facts_to_str(user_data),
-                                          reply_markup=confirm_markup)
-                user_data['choice'] = "confirm"
-                return CONFIRM
+                userlanguage_reply_keyboard = [KeyboardButton(s) for s in languages]
+                userlanguage_markup = ReplyKeyboardMarkup(build_menu(userlanguage_reply_keyboard, n_cols=3))
+                update.message.reply_text("Scegli la tua lingua:",
+                                          reply_markup=userlanguage_markup)
+                return USERLANGUAGE
             else:
                 update.message.reply_text("Mi hai inviato un livello errato!\n"
                                           "Devi inviare un numero compreso fra 1 e 40.\n"
@@ -221,6 +241,14 @@ def received_information(bot, update, user_data):
                                       "Riprova...")
             user_data['choice'] = "level"
             return TYPING_REPLY
+    elif category == "language":
+        update.message.reply_text("Ok! Ecco i dati che conosco:"
+                                  "%s"
+                                  "Adesso conosco tutti i tuoi dati. Vuoi confermarli o cambiarli?"
+                                  % facts_to_str(user_data),
+                                  reply_markup=confirm_markup)
+        user_data['choice'] = "confirm"
+        return CONFIRM
     elif category == "confirm":
         if text == "Ricomincia":
             user_data.clear()
@@ -233,16 +261,18 @@ def received_information(bot, update, user_data):
                                       "Qual'e' il tuo nickname su Pokemon-Go?")
             return TYPING_REPLY
         elif text == "Confermo":
-            ins = "INSERT OR IGNORE INTO USERS (ID,NAME,TEAM,LEVEL,FIRSTNAME,SURNAME,USERNAME) \
+            ins = "INSERT OR IGNORE INTO USERS (ID,NAME,TEAM,LEVEL,FIRSTNAME,SURNAME,USERNAME,LANGUAGE) \
                    VALUES (%d, '%s', '%s', %d, '%s', '%s', '%s' );" % (update.message.chat_id, user_data['username'], \
                                                                        user_data['team'], int(user_data['level']), \
                                                                        update.message.from_user.first_name,
                                                                        update.message.from_user.last_name,
-                                                                       update.message.from_user.username)
-            upd = "UPDATE USERS SET NAME = '%s', TEAM = '%s', LEVEL = %d, FIRSTNAME = '%s', SURNAME = '%s', USERNAME = '%s' \
+                                                                       update.message.from_user.username,
+                                                                       int(languages_id[languages.index(user_data['language'])]))
+            upd = "UPDATE USERS SET NAME = '%s', TEAM = '%s', LEVEL = %d, FIRSTNAME = '%s', SURNAME = '%s', USERNAME = '%s', LANGUAGE = %d \
                    WHERE ID = %d;" % (user_data['username'], user_data['team'], int(user_data['level']), \
                                       update.message.from_user.first_name, update.message.from_user.last_name, \
-                                      update.message.from_user.username, update.message.chat_id)
+                                      update.message.from_user.username, update.message.chat_id, \
+                                      int(languages_id[languages.index(user_data['language'])]))
             # Open database connection
             conn = sqlite3.connect('pogohelper.db')
             conn.execute(ins)
@@ -251,6 +281,10 @@ def received_information(bot, update, user_data):
             # Close database connection
             conn.close()
 
+            default_language = int(languages_id[languages.index(user_data['language'])])
+            # Load language file
+            with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
+                language = json.load(language_file)
             update.message.reply_text("Ok, ho salvato i tuoi dati nel database interno del bot!\n"
                                       "Da ora puoi creare dei RAID o partecipare ai RAID che creano gli altri!",
                                       reply_markup=raid_markup)
@@ -258,6 +292,7 @@ def received_information(bot, update, user_data):
             del user_data['level']
             del user_data['team']
             del user_data['confirm']
+            del user_data['language']
             return RAID
                                       
         else:
@@ -649,6 +684,8 @@ def raid_management(bot, update, job_queue, user_data):
             del user_data['level']
         if 'team' in user_data:
             del user_data['team']
+        if 'language' in user_data:
+            del user_data['language']
         user_data['choice'] = "username"
         update.message.reply_text("Ok! Ripetimi i dati del tuo profilo:\n"
                                   "Qual'e' il tuo nickname su Pokemon-Go?")
@@ -908,6 +945,10 @@ def main():
                                              received_information,
                                              pass_user_data=True),
                                 ],
+            USERLANGUAGE: [RegexHandler('^('+'|'.join(languages)+')$',
+                                        received_information,
+                                        pass_user_data=True),
+                           ],
             TYPING_REPLY: [MessageHandler(Filters.text,
                                           received_information,
                                           pass_user_data=True),
@@ -947,7 +988,7 @@ def main():
     updater.idle()
 
     # Send shutdown notifications
-    botShutdown()
+    #botShutdown()
 
 
 if __name__ == '__main__':
