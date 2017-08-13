@@ -15,6 +15,9 @@ import sys
 import ast
 import re
 
+# Default language
+default_language = 2 # 1 - English, 2 - Italian
+
 # Admins that are enabled to restart the bot with /r command
 LIST_OF_ADMINS = []
 fileadmin = open('admins.txt','r')
@@ -79,44 +82,44 @@ conn.close()
 TEAM, CONFIRM, CONFIRMYESNO, RAID, RAIDEDIT, RAIDFRIENDS, RAIDPREFERREDTIME, USERLANGUAGE, TYPING_REPLY, TYPING_LOCATION = range(10)
 
 # Custom reply keyboards
-team_reply_keyboard = [['Istinto-Giallo'],
-                      ['Saggezza-Blu'],
-                      ['Coraggio-Rosso']]
-team_markup = ReplyKeyboardMarkup(team_reply_keyboard, one_time_keyboard=True)
+def build_custom_keyboards(language):
+    # Build custom keyboars with selected language
+    global team_markup
+    global confirm_markup
+    global confirmok_markup
+    global confirmyesno_markup
+    global raid_markup
+    global raidboss_markup
+    global raidbossexpire_markup
+    global sqlexpire
+    global raid_friends_markup
+    team_reply_keyboard = language["team_reply_keyboard"]
+    team_markup = ReplyKeyboardMarkup(team_reply_keyboard, one_time_keyboard=True)
+    
+    confirm_reply_keyboard = language["confirm_reply_keyboard"]
+    confirm_markup = ReplyKeyboardMarkup(confirm_reply_keyboard, one_time_keyboard=True)
+    
+    confirmok_reply_keyboard = language["confirmok_reply_keyboard"]
+    confirmok_markup = ReplyKeyboardMarkup(confirmok_reply_keyboard, one_time_keyboard=True)
+    
+    confirmyesno_reply_keyboard = language["confirmyesno_reply_keyboard"]
+    confirmyesno_markup = ReplyKeyboardMarkup(confirmyesno_reply_keyboard, one_time_keyboard=True)
+    
+    raid_reply_keyboard = language["raid_reply_keyboard"]
+    raid_markup = ReplyKeyboardMarkup(raid_reply_keyboard, one_time_keyboard=True)
+    
+    raidboss_reply_keyboard = [KeyboardButton(s) for s in raidboss]
+    raidboss_markup = ReplyKeyboardMarkup(build_menu(raidboss_reply_keyboard, n_cols=3))
+    
+    raidbossexpire = language["raidbossexpire"]
+    raidbossexpire_reply_keyboard = language["raidbossexpire_reply_keyboard"]
+    raidbossexpire_markup = ReplyKeyboardMarkup(raidbossexpire_reply_keyboard, one_time_keyboard=True)
+    sqlexpire = ['+30 Minute','+45 Minute','+60 Minute','+75 Minute','+90 Minute','+105 Minute','+120 Minute']
+    
+    raid_friends_reply_keyboard = language["raid_friends_reply_keyboard"]
+    raid_friends_markup = ReplyKeyboardMarkup(raid_friends_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 
-confirm_reply_keyboard = [['Confermo'],
-                         ['Ricomincia']]
-confirm_markup = ReplyKeyboardMarkup(confirm_reply_keyboard, one_time_keyboard=True)
-
-confirmok_reply_keyboard = [['Confermo']]
-confirmok_markup = ReplyKeyboardMarkup(confirmok_reply_keyboard, one_time_keyboard=True)
-
-confirmyesno_reply_keyboard = [['Si'],['No']]
-confirmyesno_markup = ReplyKeyboardMarkup(confirmyesno_reply_keyboard, one_time_keyboard=True)
-
-raid_reply_keyboard = [['Vedi RAID Attivi'],['Crea Nuovo RAID'],
-                      ['Vedi Utenti Registrati'],
-                      ['Abilita Notifiche'],['Disabilita Notifiche'],
-                      ['Edita Profilo']]
-raid_markup = ReplyKeyboardMarkup(raid_reply_keyboard, one_time_keyboard=True)
-
-raidboss_reply_keyboard = [KeyboardButton(s) for s in raidboss]
-raidboss_markup = ReplyKeyboardMarkup(build_menu(raidboss_reply_keyboard, n_cols=3))
-
-raidbossexpire = ['30 min','45 min','1 ora','1 ora e 15 min','1 ora e 30 min','1 ora e 45 min','2 ore']
-raidbossexpire_reply_keyboard = [['30 min'],['45 min'],['1 ora'],
-                                ['1 ora e 15 min'],['1 ora e 30 min'],
-                                ['1 ora e 45 min'],['2 ore']]
-raidbossexpire_markup = ReplyKeyboardMarkup(raidbossexpire_reply_keyboard, one_time_keyboard=True)
-sqlexpire = ['+30 Minute','+45 Minute','+60 Minute','+75 Minute','+90 Minute','+105 Minute','+120 Minute']
-
-raid_friends_reply_keyboard = [['Nessuno'],
-                              ['1'],['2'],['3'],['4'],['5'],
-                              ['6'],['7'],['8'],['9'],['10']]
-raid_friends_markup = ReplyKeyboardMarkup(raid_friends_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
-
-# Default language
-default_language = 1
+    return True
 
 # Restricted access to some specific command
 def restricted(func):
@@ -172,6 +175,7 @@ def start(bot, update, job_queue, user_data):
             # Load language file
             with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
                 language = json.load(language_file)
+            build_custom_keyboards(language)
             update.message.reply_text(language["welcome1"] % (name),
                                       reply_markup=raid_markup)
             sel = "SELECT NOTIFICATIONS FROM USERS WHERE ID = %d;" % (update.message.chat_id)
@@ -228,6 +232,7 @@ def received_information(bot, update, user_data):
                 userlanguage_markup = ReplyKeyboardMarkup(build_menu(userlanguage_reply_keyboard, n_cols=3))
                 update.message.reply_text("Scegli la tua lingua:",
                                           reply_markup=userlanguage_markup)
+                user_data['choice'] = "language"
                 return USERLANGUAGE
             else:
                 update.message.reply_text("Mi hai inviato un livello errato!\n"
@@ -262,17 +267,18 @@ def received_information(bot, update, user_data):
             return TYPING_REPLY
         elif text == "Confermo":
             ins = "INSERT OR IGNORE INTO USERS (ID,NAME,TEAM,LEVEL,FIRSTNAME,SURNAME,USERNAME,LANGUAGE) \
-                   VALUES (%d, '%s', '%s', %d, '%s', '%s', '%s' );" % (update.message.chat_id, user_data['username'], \
-                                                                       user_data['team'], int(user_data['level']), \
-                                                                       update.message.from_user.first_name,
-                                                                       update.message.from_user.last_name,
-                                                                       update.message.from_user.username,
-                                                                       int(languages_id[languages.index(user_data['language'])]))
+                   VALUES (%d, '%s', '%s', %d, '%s', '%s', '%s', %d );" % (update.message.chat_id, user_data['username'], \
+                                                                           user_data['team'], int(user_data['level']), \
+                                                                           update.message.from_user.first_name,
+                                                                           update.message.from_user.last_name,
+                                                                           update.message.from_user.username,
+                                                                           int(languages_id[languages.index(user_data['language'])]))
             upd = "UPDATE USERS SET NAME = '%s', TEAM = '%s', LEVEL = %d, FIRSTNAME = '%s', SURNAME = '%s', USERNAME = '%s', LANGUAGE = %d \
                    WHERE ID = %d;" % (user_data['username'], user_data['team'], int(user_data['level']), \
                                       update.message.from_user.first_name, update.message.from_user.last_name, \
-                                      update.message.from_user.username, update.message.chat_id, \
-                                      int(languages_id[languages.index(user_data['language'])]))
+                                      update.message.from_user.username, \
+                                      int(languages_id[languages.index(user_data['language'])]), \
+                                      update.message.chat_id)
             # Open database connection
             conn = sqlite3.connect('pogohelper.db')
             conn.execute(ins)
@@ -285,6 +291,7 @@ def received_information(bot, update, user_data):
             # Load language file
             with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
                 language = json.load(language_file)
+            build_custom_keyboards(language)
             update.message.reply_text("Ok, ho salvato i tuoi dati nel database interno del bot!\n"
                                       "Da ora puoi creare dei RAID o partecipare ai RAID che creano gli altri!",
                                       reply_markup=raid_markup)

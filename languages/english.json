@@ -1,4 +1,12 @@
 {
+  "team_reply_keyboard": [["Instinct-Yellow"],["Mystic-Blue"],["Valor-Red"]],
+  "confirm_reply_keyboard": [["Confirmed"],["Restart"]],
+  "confirmok_reply_keyboard": [["Confirmed"]],
+  "confirmyesno_reply_keyboard": [["Yes"],["No"]],
+  "raid_reply_keyboard": [["Show active RAIDs"],["Create new RAID"],["Show Registered Users"],["Enable Notifications"],["Disable Notifications"],["Edit Profile"]],
+  "raidbossexpire": ["30 min","45 min","1 hour","1 hour and 15 min","1 hour and 30 min","1 hour and 45 min","2 hours"],
+  "raidbossexpire_reply_keyboard": [["30 min"],["45 min"],["1 hour"],["1 hour and 15 min"],["1 hour and 30 min"],["1 hour and 45 min"],["2 hours"]],
+  "raid_friends_reply_keyboard": [["Nobody"],["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],
   "welcome1": "Welcome %s!",
   "welcome2": "Hi! This bot is aimed to help with the organization of Pokemon-Go RAID Battles.\nFirst of all I need some info. What's your Pokemon-Go nickname?"
 }

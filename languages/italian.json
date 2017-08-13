@@ -1,4 +1,12 @@
 {
+  "team_reply_keyboard": [["Istinto-Giallo"],["Saggezza-Blu"],["Coraggio-Rosso"]],
+  "confirm_reply_keyboard": [["Confermo"],["Ricomincia"]],
+  "confirmok_reply_keyboard": [["Confermo"]],
+  "confirmyesno_reply_keyboard": [["Si"],["No"]],
+  "raid_reply_keyboard": [["Vedi RAID Attivi"],["Crea Nuovo RAID"],["Vedi Utenti Registrati"],["Abilita Notifiche"],["Disabilita Notifiche"],["Edita Profilo"]],
+  "raidbossexpire": ["30 min","45 min","1 ora","1 ora e 15 min","1 ora e 30 min","1 ora e 45 min","2 ore"],
+  "raidbossexpire_reply_keyboard": [["30 min"],["45 min"],["1 ora"],["1 ora e 15 min"],["1 ora e 30 min"],["1 ora e 45 min"],["2 ore"]],
+  "raid_friends_reply_keyboard": [["Nessuno"],["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],
   "welcome1": "Bentornato %s!",
   "welcome2": "Ciao! Questo bot e' programmato per aiutare nell'organizzazione di RAID per Pokemon-Go.\nIntanto mi servono alcune informazioni. Qual'e' il tuo nickname su Pokemon-Go?"
 }
