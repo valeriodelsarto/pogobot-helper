@@ -204,7 +204,7 @@ def received_information(bot, update, user_data):
         user_data['choice'] = "username"
     text = update.message.text
     category = user_data['choice']
-    if not (text == "Confermo" and category == "gym"):
+    if not (text == language["confirmok_reply_keyboard"][0][0] and category == "gym"):
       user_data[category] = text
     #del user_data['choice']
     #pprint.pprint(update.message.from_user)
