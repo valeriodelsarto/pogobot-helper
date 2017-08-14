@@ -16,7 +16,7 @@ import ast
 import re
 
 # Default language
-default_language = 2 # 1 - English, 2 - Italian
+default_language = 2 # 1 - English, 2 - Italian, 3 - Dutch
 
 # Admins that are enabled to restart the bot with /r command
 LIST_OF_ADMINS = []
