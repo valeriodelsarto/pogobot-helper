@@ -23,5 +23,11 @@
   "raid_expire": "Now I need to know when the RAID will expire. In order to give time to other trainers to attend, you can't create RAIDs that will expire less than 30 minutes from now. Tell me when this RAID will expire (about):",
   "raid_expire_error": "Wrong answer! Please tell me when this RAID will expire (about):",
   "raid_gym_text": "Ok, if you know please write the name of the Gym where the RAID will take place, or some info related to where the Gym is located",
-  "raid_gym_confirm": "Do you confirm the name or the description given to the Gym? (If you want to change it, please write a new text otherwise click Confirmed)"
+  "raid_gym_confirm": "Do you confirm the name or the description given to the Gym? (If you want to change it, please write a new text otherwise click Confirmed)",
+  "raid_confirm": "Now I already know all RAID data.Do you want to confirm or change them?",
+  "text_cancel": "Ok! All data sent has been canceled.",
+  "raid_save": "Ok, RAID data has been saved into my local database! Now you can see this new RAID into the RAIDs list!",
+  "generic_error": "I don't understand! Here's what I already know:",
+  "raid_remove_attend": "Ok! You have been removed from the attendees list of RAID number %d!",
+  "raid_add_attend": "Ok, you have been added to the attendees list of this RAID! Here's the updated list of the attendees at this RAID:"
 }
