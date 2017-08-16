@@ -169,13 +169,14 @@ def start(bot, update, job_queue, user_data):
         # Close db connection
         conn.close()
 
+        default_language = int(row[1])
+        # Load language file
+        with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
+            language = json.load(language_file)
+        build_custom_keyboards(language)
+
         # if a user is already registered
         if present == 1:
-            default_language = int(row[1])
-            # Load language file
-            with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
-                language = json.load(language_file)
-            build_custom_keyboards(language)
             update.message.reply_text(language["welcome1"] % (name),
                                       reply_markup=raid_markup)
             sel = "SELECT NOTIFICATIONS FROM USERS WHERE ID = %d;" % (update.message.chat_id)
