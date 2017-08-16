@@ -29,5 +29,12 @@
   "raid_save": "Ok, RAID data has been saved into my local database! Now you can see this new RAID into the RAIDs list!",
   "generic_error": "I don't understand! Here's what I already know:",
   "raid_remove_attend": "Ok! You have been removed from the attendees list of RAID number %d!",
-  "raid_add_attend": "Ok, you have been added to the attendees list of this RAID! Here's the updated list of the attendees at this RAID:"
+  "raid_add_attend": "Ok, you have been added to the attendees list of this RAID! Here's the updated list of the attendees at this RAID:",
+  "raid_attend_you": "You are an attendee at this RAID!",
+  "raid_attend_another": "Also %s will attend at this RAID! It's level %d and belongs to the %s Team. His/her preferred time is %s",
+  "raid_attend_another_friends": "%s has also %d friends that will attend!",
+  "raid_preferred_time": "Preferred times for this RAID are (with related attendees):",
+  "hours": "Hours",
+  "attendees": "Attendees",
+  "raid_final_info": "Right now there are %d attendees at this RAID! %d Team Instinct-Yellow, %d Team Mystic-Blue, %d Team Valor-Red. %d level 40, %d level >=35, %d level >=30. There are also %d friends that will attend."
 }

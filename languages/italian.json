@@ -36,7 +36,7 @@
   "raid_preferred_time": "Gli orari preferiti per il RAID sono (con i relativi partecipanti):",
   "hours": "Ore",
   "attendees": "Partecipanti",
-  "raid_final_info": "Per ora ci sono %d partecipanti a questo RAID! Ci sono %d del team Istinto-Giallo. Ci sono %d del team Saggezza-Blu. Ci sono %d del team Coraggio-Rosso. Ci sono %d livelli 40. Ci sono %d livelli 35 o superiore. Ci sono %d livelli 30 o superiore. Ci sono %d amici che partecipano.",
+  "raid_final_info": "Per ora ci sono %d partecipanti a questo RAID! %d Team Istinto-Giallo, %d Team Saggezza-Blu, %d Team Coraggio-Rosso. %d livelli 40, %d livelli >=35, %d livelli >=30. Ci sono anche %d amici che partecipano.",
   "raid_ask_preferred_time_later": "Il tuo orario preferito non e' ancora inserito, te lo chiedero' fra poco.",
   "raid_friends": "Ok! Ora dimmi se ci sono degli amici con te che parteciperanno e non hanno Telegram quindi non possono registrarsi in questo RAID:",
   "raid_attend_confirm": "Ok! Presenza confermata, Torno al menu' principale!",
