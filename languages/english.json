@@ -8,5 +8,12 @@
   "raidbossexpire_reply_keyboard": [["30 min"],["45 min"],["1 hour"],["1 hour and 15 min"],["1 hour and 30 min"],["1 hour and 45 min"],["2 hours"]],
   "raid_friends_reply_keyboard": [["Nobody"],["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],
   "welcome1": "Welcome %s!",
-  "welcome2": "Hi! This bot is aimed to help with the organization of Pokemon-Go RAID Battles.\nFirst of all I need some info. What's your Pokemon-Go nickname?"
+  "welcome2": "Hi! This bot is aimed to help with the organization of Pokemon-Go RAID Battles.\nFirst of all I need some info. What's your Pokemon-Go nickname?",
+  "text_ok": "Ok! Here's what I already know:",
+  "ask_team": "Now I need to know to what Team you belong to:",
+  "ask_level": "Now I need to know at what level you are:",
+  "ask_language": "Please choose your language:",
+  "wrong_level": "You sent me a wrong level! Please send me a number between 1 and 40. Please try it again...",
+  "ask_confirm": "Now I know all of your details. Would you confirm or change them?",
+  "text_restart": "Ok! All data sent has been canceled. Let's begin again! What is your Pokemon-Go nickname?"
 }
