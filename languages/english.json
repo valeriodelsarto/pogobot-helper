@@ -36,5 +36,17 @@
   "raid_preferred_time": "Preferred times for this RAID are (with related attendees):",
   "hours": "Hours",
   "attendees": "Attendees",
-  "raid_final_info": "Right now there are %d attendees at this RAID! %d Team Instinct-Yellow, %d Team Mystic-Blue, %d Team Valor-Red. %d level 40, %d level >=35, %d level >=30. There are also %d friends that will attend."
+  "raid_final_info": "Right now there are %d attendees at this RAID! %d Team Instinct-Yellow, %d Team Mystic-Blue, %d Team Valor-Red. %d level 40, %d level >=35, %d level >=30. There are also %d friends that will attend.",
+  "raid_ask_preferred_time_later": "Your preferred time has not yet been selected, I'll ask for it soon.",
+  "raid_friends": "Ok! Now please tell me if you have friends with you that will attend and can't confirm their presence using Telegram and this bot:",
+  "raid_attend_confirm": "Ok! You have been confirmed as an attendee! Going back to the main menu'!",
+  "raid_confirm_error": "I don't understand! Do you want to attend at this RAID?",
+  "raid_ask_preferred_time": "Ok! Now please tell me what is your preferred time to attend:",
+  "saved_data": "Ok! All data has been saved! Going back to the main menu'.",
+  "text_restart_error": "I don't understand! Let's start again! What is your Pokemon-Go nickname?",
+  "raid_list": "Here is the list of the active RAIDs!",
+  "raid_info": "ID: %d,\nBoss: %s,\nExpire: %s,\nGym: %s,\nposition will follow:",
+  "raid_info_createdby": "This RAID has been created by %s %s @%s",
+  "raid_info_gymhuntr": "If you want to check the RAID presence please use the following link on GYMHUNTR: https://gymhuntr.com/#%f,%f",
+  "raid_empty": "There are no active RAIDs!"
 }
