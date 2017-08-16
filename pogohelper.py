@@ -527,7 +527,7 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "confirmraidattend"
             return CONFIRMYESNO
     elif category == "confirmraidattend_friends":
-        if text == "Nessuno":
+        if text == language["raid_friends_reply_keyboard"][0][0]:
             upd = "UPDATE RAIDPLAYERS SET FRIENDS = 0 WHERE RAIDID = %d AND PLAYERID = %d;" % (int(user_data['raidid']),update.message.chat_id)
             conn = sqlite3.connect('pogohelper.db')
             conn.execute(upd)
@@ -588,6 +588,7 @@ def received_information(bot, update, user_data):
         return TYPING_REPLY
 
 
+# Not used
 def done(bot, update, user_data):
     if 'choice' in user_data:
         del user_data['choice']
@@ -600,7 +601,7 @@ def done(bot, update, user_data):
 
 def raid_management(bot, update, job_queue, user_data):
     text = update.message.text
-    if text == "Vedi RAID Attivi":
+    if text == language["raid_reply_keyboard"][0][0]:
         if 'job_delete_old_raids' not in user_data:
             # Add job to queue (delete old raids every 5 minutes)
             job = job_queue.run_repeating(delete_old_raids, 300)
@@ -644,13 +645,13 @@ def raid_management(bot, update, job_queue, user_data):
             conn.close()
             return RAIDEDIT
         
-    elif text == "Crea Nuovo RAID":
+    elif text == language["raid_reply_keyboard"][0][1]:
         update.message.reply_text("Inviami i dati del RAID che vuoi creare!\n"
                                   "Per prima cosa dimmi il nome del BOSS:",
                                   reply_markup=raidboss_markup)
         user_data['choice'] = "raidboss"
         return TYPING_REPLY
-    elif text == "Abilita Notifiche":
+    elif text == language["raid_reply_keyboard"][0][3]:
         if 'job_notifications' not in user_data:
             # Add job to queue
             job = job_queue.run_repeating(notify_raids, 60, context=update.message.chat_id)
@@ -667,7 +668,7 @@ def raid_management(bot, update, job_queue, user_data):
             update.message.reply_text("Le notifiche di nuovi RAID sono gia' attive!",
                                       reply_markup=raid_markup)
             return RAID
-    elif text == "Disabilita Notifiche":
+    elif text == language["raid_reply_keyboard"][0][4]:
         if 'job_notifications' not in user_data:
             update.message.reply_text("Le notifiche di nuovi RAID sono gia' disabilitate!",
                                       reply_markup=raid_markup)
@@ -685,7 +686,7 @@ def raid_management(bot, update, job_queue, user_data):
             update.message.reply_text("Notifiche di nuovi RAID disabilitate!",
                                       reply_markup=raid_markup)
             return RAID
-    elif text == "Edita Profilo":
+    elif text == language["raid_reply_keyboard"][0][5]:
         if 'username' in user_data:
             del user_data['username']
         if 'level' in user_data:
@@ -698,7 +699,7 @@ def raid_management(bot, update, job_queue, user_data):
         update.message.reply_text("Ok! Ripetimi i dati del tuo profilo:\n"
                                   "Qual'e' il tuo nickname su Pokemon-Go?")
         return TYPING_REPLY
-    elif text == "Vedi Utenti Registrati":
+    elif text == language["raid_reply_keyboard"][0][2]:
         utenti_registrati = "Ecco l'elenco degli utenti registrati:\n"
         sel = "SELECT NAME,TEAM,LEVEL FROM USERS ORDER BY LEVEL DESC;"
         conn = sqlite3.connect('pogohelper.db')
@@ -751,11 +752,11 @@ def raidedit_management(bot, update, user_data):
                 sel2 = "SELECT NAME,TEAM,LEVEL FROM USERS WHERE ID = %d;" % (row[0])
                 cursor2 = conn.execute(sel2)
                 for row2 in cursor2:
-                    if row2[1] == "Istinto-Giallo":
+                    if row2[1] == language["team_reply_keyboard"][0][0]:
                         totgialli += 1
-                    elif row2[1] == "Saggezza-Blu":
+                    elif row2[1] == language["team_reply_keyboard"][0][1]:
                         totblu += 1
-                    elif row2[1] == "Coraggio-Rosso":
+                    elif row2[1] == language["team_reply_keyboard"][0][2]:
                         totrossi += 1
                     if row2[2] >= 40:
                         tot40 += 1
@@ -919,24 +920,49 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    # Load language files for menu Regexs
+    regex_team = '^('
+    regex_confirm = '^('
+    regex_yesno = '^('
+    regex_menu = '^('
+    regex_raidfriends = '^([1-9]|10|'
+    for language_text in languages:
+        with open('languages/'+language_text.lower()+'.json') as language_file_menu:
+            language_menu = json.load(language_file_menu)
+        regex_team += '|'.join(language_menu["team_reply_keyboard"][0])+'|'
+        regex_confirm += '|'.join(language_menu["confirm_reply_keyboard"][0])+'|'
+        regex_yesno += '|'.join(language_menu["confirmyesno_reply_keyboard"][0])+'|'
+        regex_menu += '|'.join(language_menu["raid_reply_keyboard"][0])+'|'
+        regex_raidfriends += language_menu["raid_friends_reply_keyboard"][0]+'|'
+    regex_team = regex_team[:-1]
+    regex_confirm = regex_confirm[:-1]
+    regex_yesno = regex_yesno[:-1]
+    regex_menu = regex_menu[:-1]
+    regex_raidfriends = regex_raidfriends[:-1]
+    regex_team += ')$'
+    regex_confirm += ')$'
+    regex_yesno += ')$'
+    regex_menu += ')$'
+    regex_raidfriends += ')$'
+
     # Add conversation handler
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start, pass_job_queue=True, pass_user_data=True)],
 
         states={
-            TEAM: [RegexHandler('^(Istinto-Giallo|Saggezza-Blu|Coraggio-Rosso)$',
+            TEAM: [RegexHandler(regex_team,
                                 received_information,
                                 pass_user_data=True),
                    ],
-            CONFIRM: [RegexHandler('^(Confermo|Ricomincia)$',
+            CONFIRM: [RegexHandler(regex_confirm,
                                    received_information,
                                    pass_user_data=True),
                       ],
-            CONFIRMYESNO: [RegexHandler('^(Si|No)$',
+            CONFIRMYESNO: [RegexHandler(regex_yesno,
                                         received_information,
                                         pass_user_data=True),
                            ],
-            RAID: [RegexHandler('^(Vedi RAID Attivi|Crea Nuovo RAID|Vedi Utenti Registrati|Abilita Notifiche|Disabilita Notifiche|Edita Profilo)$',
+            RAID: [RegexHandler(regex_menu,
                                 raid_management,
                                 pass_job_queue=True,
                                 pass_user_data=True),
@@ -945,7 +971,7 @@ def main():
                                     raidedit_management,
                                     pass_user_data=True),
                        ],
-            RAIDFRIENDS: [RegexHandler('^([1-9]|10|Nessuno)$',
+            RAIDFRIENDS: [RegexHandler(regex_raidfriends,
                                        received_information,
                                        pass_user_data=True),
                           ],
