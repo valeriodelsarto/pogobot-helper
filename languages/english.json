@@ -15,5 +15,13 @@
   "ask_language": "Please choose your language:",
   "wrong_level": "You sent me a wrong level! Please send me a number between 1 and 40. Please try it again...",
   "ask_confirm": "Now I know all of your details. Would you confirm or change them?",
-  "text_restart": "Ok! All data sent has been canceled. Let's begin again! What is your Pokemon-Go nickname?"
+  "text_restart": "Ok! All data sent has been canceled. Let's begin again! What is your Pokemon-Go nickname?",
+  "text_save": "Ok, all data has been saved into my local database! From now on you can create new RAIDs or join RAIDs that have been created by other trainers!",
+  "boss_unavailable": "This BOSS doesn't exist! Please select a BOSS:",
+  "ask_location": "Now I need to know your location, please send me your location using Telegram:",
+  "location_error": "What you sent me is not a location! Please send me your location using Telegram:",
+  "raid_expire": "Now I need to know when the RAID will expire. In order to give time to other trainers to attend, you can't create RAIDs that will expire less than 30 minutes from now. Tell me when this RAID will expire (about):",
+  "raid_expire_error": "Wrong answer! Please tell me when this RAID will expire (about):",
+  "raid_gym_text": "Ok, if you know please write the name of the Gym where the RAID will take place, or some info related to where the Gym is located",
+  "raid_gym_confirm": "Do you confirm the name or the description given to the Gym? (If you want to change it, please write a new text otherwise click Confirmed)"
 }
