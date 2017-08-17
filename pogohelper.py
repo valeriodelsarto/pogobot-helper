@@ -562,7 +562,7 @@ def raid_management(bot, update, job_queue, user_data):
             user_data['job_delete_old_raids'] = job
         # Open database connection
         conn = sqlite3.connect('pogohelper.db')
-        update.message.reply_text("Ecco la lista dei RAID attivi!",
+        update.message.reply_text(language["raid_list"],
                                   reply_markup=ReplyKeyboardRemove())
         sel = "SELECT RAID.ID,RAID.BOSS,RAID.LAT,RAID.LONG,RAID.TIME,RAID.GYM,USERS.FIRSTNAME,USERS.SURNAME,USERS.USERNAME \
                FROM RAID LEFT JOIN USERS ON RAID.CREATED_BY = USERS.ID ORDER BY RAID.TIME;"
@@ -572,19 +572,18 @@ def raid_management(bot, update, job_queue, user_data):
         col = 1
         for row in cursor:
             scadenza = datetime.strptime(row[4],'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M')
-            update.message.reply_text("ID: %d,\nBoss: %s,\nScadenza: %s,\nPalestra: %s,\nsegue posizione:"
+            update.message.reply_text(language["raid_info"]
                                       % (row[0], row[1], scadenza, row[5]))
             bot.sendLocation(update.message.chat_id,row[2],row[3])
-            update.message.reply_text("Questo RAID e' stato creato da %s %s @%s" % (row[6], row[7], row[8]))
-            update.message.reply_text("Se vuoi controllare la correttezza di questo RAID usa il seguente link su GYMHUNTR:\n"
-                                      "https://gymhuntr.com/#%f,%f" % (row[2],row[3]))
+            update.message.reply_text(language["raid_info_createdby"] % (row[6], row[7], row[8]))
+            update.message.reply_text(language["raid_info_gymhuntr"] % (row[2],row[3]))
             raids.append(str(row[0]))
             totrighe += 1
             col += 1
             if col == 4:
                 col = 1
         if totrighe == 0:
-            update.message.reply_text("Non ci sono RAID attivi!",
+            update.message.reply_text(language["raid_empty"],
                                       reply_markup=raid_markup)
             # Close database connection
             conn.close()
@@ -593,15 +592,14 @@ def raid_management(bot, update, job_queue, user_data):
             raids.append('Menu')
             raidedit_reply_keyboard = [KeyboardButton(s) for s in raids]
             raidedit_markup = ReplyKeyboardMarkup(build_menu(raidedit_reply_keyboard, n_cols=3))
-            update.message.reply_text("Scegli se vuoi editare un RAID o tornare al menu' principale:",
+            update.message.reply_text(language["raid_edit"],
                                       reply_markup=raidedit_markup)
             # Close database connection
             conn.close()
             return RAIDEDIT
         
     elif text == language["raid_reply_keyboard"][0][1]:
-        update.message.reply_text("Inviami i dati del RAID che vuoi creare!\n"
-                                  "Per prima cosa dimmi il nome del BOSS:",
+        update.message.reply_text(language["raid_create"],
                                   reply_markup=raidboss_markup)
         user_data['choice'] = "raidboss"
         return TYPING_REPLY
@@ -615,16 +613,16 @@ def raid_management(bot, update, job_queue, user_data):
             conn.execute(upd)
             conn.commit()
             conn.close()
-            update.message.reply_text("Notifiche di nuovi RAID abilitate!",
+            update.message.reply_text(language["raid_notifications_enabled"],
                                       reply_markup=raid_markup)
             return RAID
         else:
-            update.message.reply_text("Le notifiche di nuovi RAID sono gia' attive!",
+            update.message.reply_text(language["raid_notifications_already_enabled"],
                                       reply_markup=raid_markup)
             return RAID
     elif text == language["raid_reply_keyboard"][0][4]:
         if 'job_notifications' not in user_data:
-            update.message.reply_text("Le notifiche di nuovi RAID sono gia' disabilitate!",
+            update.message.reply_text(language["raid_notifications_already_disabled"],
                                       reply_markup=raid_markup)
             return RAID
         else:
@@ -637,7 +635,7 @@ def raid_management(bot, update, job_queue, user_data):
             conn.execute(upd)
             conn.commit()
             conn.close()
-            update.message.reply_text("Notifiche di nuovi RAID disabilitate!",
+            update.message.reply_text(language["raid_notifications_disabled"],
                                       reply_markup=raid_markup)
             return RAID
     elif text == language["raid_reply_keyboard"][0][5]:
@@ -650,16 +648,15 @@ def raid_management(bot, update, job_queue, user_data):
         if 'language' in user_data:
             del user_data['language']
         user_data['choice'] = "username"
-        update.message.reply_text("Ok! Ripetimi i dati del tuo profilo:\n"
-                                  "Qual'e' il tuo nickname su Pokemon-Go?")
+        update.message.reply_text(language["profile_modify"])
         return TYPING_REPLY
     elif text == language["raid_reply_keyboard"][0][2]:
-        utenti_registrati = "Ecco l'elenco degli utenti registrati:\n"
+        utenti_registrati = language["users_list"]
         sel = "SELECT NAME,TEAM,LEVEL FROM USERS ORDER BY LEVEL DESC;"
         conn = sqlite3.connect('pogohelper.db')
         cursor = conn.execute(sel)
         for row in cursor:
-            utenti_registrati += row[0]+" Team "+row[1]+" Livello "+str(row[2])+"\n"
+            utenti_registrati += row[0]+" "+language["users_team"]+" "+row[1]+" "+language["users_level"]+" "+str(row[2])+"\n"
         conn.close()
         utenti_registrati = utenti_registrati[:-1]
         update.message.reply_text(utenti_registrati,
@@ -670,7 +667,7 @@ def raid_management(bot, update, job_queue, user_data):
 def raidedit_management(bot, update, user_data):
     text = update.message.text
     if text == "Menu":
-        update.message.reply_text("Ok! Ritorno al menu' principale.",
+        update.message.reply_text(language["menu"],
                                   reply_markup=raid_markup)
         return RAID
     elif text.isdigit():
@@ -683,7 +680,7 @@ def raidedit_management(bot, update, user_data):
             presente = True
             user_data['raidexpire'] = row[4]
             raidbossstrength = float(row[6])
-            update.message.reply_text("Ok! Selezionato il RAID numero %d con BOSS %s!"
+            update.message.reply_text(language["raid_selected"]
                                       % (int(text), row[1]),
                                       reply_markup=ReplyKeyboardRemove())
         if presente:
@@ -722,12 +719,10 @@ def raidedit_management(bot, update, user_data):
                         
                     tempo_preferito = str(datetime.strptime(row[2],'%Y-%m-%d %H:%M:%S').strftime('%H:%M'))
                     if row[0] == update.message.chat_id:
-                        update.message.reply_text("A questo RAID partecipi anche te!",
+                        update.message.reply_text(language["raid_attend_you"],
                                                   reply_markup=ReplyKeyboardRemove())
                     else:
-                        update.message.reply_text("A questo RAID partecipa anche %s!\n"
-                                                  "E' un livello %d e appartiene al Team %s\n"
-                                                  "L'orario a cui preferisce partecipare al RAID e': %s"
+                        update.message.reply_text(language["raid_attend_another"]
                                                   % (row2[0], int(row2[2]), row2[1], tempo_preferito),
                                                   reply_markup=ReplyKeyboardRemove())
                     if tempo_preferito in dict_preferred_time:
@@ -735,15 +730,14 @@ def raidedit_management(bot, update, user_data):
                     else:
                         dict_preferred_time[tempo_preferito] = 1
                     if row[1] > 0:
-                        update.message.reply_text("%s ha anche %d amici che partecipano!"
+                        update.message.reply_text(language["raid_attend_another_friends"]
                                                   % (row2[0],row[1]))
                         totpartecipanti += row[1]
                         totamici += row[1]
                         dict_preferred_time[tempo_preferito] += row[1]
                 totpartecipanti += 1
             if totpartecipanti == 0:
-                update.message.reply_text("Per ora non ci sono partecipanti a questo RAID!\n"
-                                          "Vuoi partecipare?",
+                update.message.reply_text(language["raid_no_attendees"],
                                           reply_markup=confirmyesno_markup)
                 conn.close()
                 user_data['raidid'] = text
@@ -751,9 +745,9 @@ def raidedit_management(bot, update, user_data):
                 user_data['firstattend'] = True
                 return CONFIRMYESNO
             else:
-                preferred_time = "Gli orari preferiti per il RAID sono (con i relativi partecipanti):\n"
+                preferred_time = language["raid_preferred_time"]
                 for key, value in dict_preferred_time.items():
-                    preferred_time += "Ore "+str(key)+" Partecipanti "+str(value)+"\n"
+                    preferred_time += language["hours"]+" "+str(key)+" "+language["attendees"]+" "+str(value)+"\n"
                 preferred_time = preferred_time[:-1]
                 tempo_medio = str(datetime.now().strftime('%H:%M'))
                 sel3 = "SELECT DATETIME(AVG(JULIANDAY(PREFERRED_TIME))) FROM RAIDPLAYERS WHERE RAIDID = %d" % (int(text))
@@ -761,41 +755,31 @@ def raidedit_management(bot, update, user_data):
                 for row3 in cursor3:
                     tempo_medio = datetime.strptime(row3[0],'%Y-%m-%d %H:%M:%S').strftime('%H:%M')
                 if raidteamstrength > raidbossstrength:
-                    preferred_time += "\n*Partecipano gia' al RAID un numero sufficiente di allenatori per sconfiggere questo BOSS! OTTIMO!*"
-                preferred_time += "\nLa media di tutti i tempi preferiti che sono stati inseriti dai partecipanti al RAID e' %s" % (tempo_medio)
+                    preferred_time += "\n"+language["raid_enough_attendees"]
+                preferred_time += "\n"
+                preferred_time += language["raid_average_preferred_time"] % (tempo_medio)
                 if raidteamstrength > raidbossstrength:
-                    preferred_time += ", trovatevi tutti alla posizione indicata all'ora indicata e sconfiggete questo BOSS! Buona fortuna allenatori!"
-                update.message.reply_text("Per ora ci sono %d partecipanti a questo RAID!\n"
-                                          "Ci sono %d del team Istinto-Giallo\n"
-                                          "Ci sono %d del team Saggezza-Blu\n"
-                                          "Ci sono %d del team Coraggio-Rosso\n"
-                                          "Ci sono %d livelli 40\n"
-                                          "Ci sono %d livelli 35 o superiore\n"
-                                          "Ci sono %d livelli 30 o superiore\n"
-                                          "Ci sono %d amici che partecipano\n"
-                                          "%s"
+                    preferred_time += language["raid_goodluck"]
+                update.message.reply_text(language["raid_final_info"]+"\n%s"
                                           % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, totover30, \
                                           totamici, preferred_time),
                                           reply_markup=ReplyKeyboardRemove(), parse_mode=ParseMode.MARKDOWN)
                 if partecipo:
-                    update.message.reply_text("Partecipi gia' a questo RAID!\n"
-                                              "Confermi la tua partecipazione?",
+                    update.message.reply_text(language["raid_confirm_attend"],
                                               reply_markup=confirmyesno_markup)
                     conn.close()
                     user_data['raidid'] = text
                     user_data['choice'] = "confirmraidattend"
                     return CONFIRMYESNO
                 else:
-                    update.message.reply_text("Per ora non stai partecipando a questo RAID!\n"
-                                              "Vuoi partecipare?",
+                    update.message.reply_text(language["raid_attend_question"],
                                               reply_markup=confirmyesno_markup)
                     conn.close()
                     user_data['raidid'] = text
                     user_data['choice'] = "confirmraidattend"
                     return CONFIRMYESNO
         else:
-            update.message.reply_text("Il RAID che mi hai indicato non esiste!\n"
-                                      "Ritorno al menu' principale.",
+            update.message.reply_text(language["raid_wrong"],
                                       reply_markup=raid_markup)
             conn.close()
             return RAID
@@ -833,7 +817,7 @@ def notify_raids(bot, job):
             if row2[1] == 1:
                 notificationready = True
         if not notificato:
-            bot.send_message(job.context, text="E' stato creato un nuovo RAID ID %d con BOSS %s e scadenza %s da %s %s @%s, segue posizione:" % (row[0],row[1],scadenza,row[2],row[3],row[4]))
+            bot.send_message(job.context, text=language["raid_notification_create"] % (row[0],row[1],scadenza,row[2],row[3],row[4]))
             bot.sendLocation(job.context,row[5],row[6])
             ins = "INSERT INTO NOTIFICATIONS (RAIDID,PLAYERID) VALUES (%d, %d);" % (row[0], job.context)
             conn.execute(ins)
@@ -845,7 +829,7 @@ def notify_raids(bot, job):
                 cursor3 = conn.execute(sel3)
                 for row3 in cursor3:
                     tempo_medio = datetime.strptime(row3[0],'%Y-%m-%d %H:%M:%S').strftime('%H:%M')
-                bot.send_message(job.context, text="E' stato raggiunto il numero minimo di partecipanti necessari a superare il RAID ID %d con BOSS %s e scadenza %s! La media di tutti i tempi preferiti che sono stati inseriti dai partecipanti al RAID e' %s, trovatevi tutti alla posizione indicata all'ora indicata e sconfiggete questo BOSS! Buona fortuna allenatori!" % (row[0],row[1],scadenza,tempo_medio))
+                bot.send_message(job.context, text=language["raid_notification_enough_attendees"] % (row[0],row[1],scadenza,tempo_medio))
                 upd = "UPDATE NOTIFICATIONS SET READY = 1 WHERE RAIDID = %d AND PLAYERID = %d;" % (row[0], job.context)
                 conn.execute(upd)
                 conn.commit()
@@ -861,9 +845,7 @@ def botShutdown():
     conn = sqlite3.connect('pogohelper.db')
     cursor = conn.execute(sel)
     for row in cursor:
-        bot.send_message(row[0], text="Il BOT e' stato riavviato per attivita' di aggiornamento o manutenzione,\n"
-                                      "clicca di nuovo /start per riattivare le notifiche!\n"
-                                      "Grazie per la pazienza!", reply_markup=ReplyKeyboardRemove())
+        bot.send_message(row[0], text=language["bot_restart"], reply_markup=ReplyKeyboardRemove())
     conn.close()
 
 
