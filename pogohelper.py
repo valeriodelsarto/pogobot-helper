@@ -211,17 +211,17 @@ def received_information(bot, update, user_data):
     #pprint.pprint(update.message.from_user)
 
     if category == "username":
-        update.message.reply_text("Ok! Ecco i dati che conosco:"
+        update.message.reply_text(language["text_ok"]
                                   "%s"
-                                  "Adesso ho bisogno di sapere a quale Team appartieni:"
+                                  language["ask_team"]
                                   % facts_to_str(user_data),
                                   reply_markup=team_markup)
         user_data['choice'] = "team"
         return TEAM
     elif category == "team":
-        update.message.reply_text("Ok! Ecco i dati che conosco:"
+        update.message.reply_text(language["text_ok"]
                                   "%s"
-                                  "Adesso ho bisogno di sapere a quale livello sei:"
+                                  language["ask_level"]
                                   % facts_to_str(user_data),
                                   reply_markup=ReplyKeyboardRemove())
         user_data['choice'] = "level"
@@ -231,42 +231,36 @@ def received_information(bot, update, user_data):
             if int(text) > 0 and int(text) <= 40:
                 userlanguage_reply_keyboard = [KeyboardButton(s) for s in languages]
                 userlanguage_markup = ReplyKeyboardMarkup(build_menu(userlanguage_reply_keyboard, n_cols=3))
-                update.message.reply_text("Scegli la tua lingua:",
+                update.message.reply_text(language["ask_language"],
                                           reply_markup=userlanguage_markup)
                 user_data['choice'] = "language"
                 return USERLANGUAGE
             else:
-                update.message.reply_text("Mi hai inviato un livello errato!\n"
-                                          "Devi inviare un numero compreso fra 1 e 40.\n"
-                                          "Riprova...")
+                update.message.reply_text(language["wrong_level"])
                 user_data['choice'] = "level"
                 return TYPING_REPLY
         else:
-            update.message.reply_text("Mi hai inviato un livello errato!\n"
-                                      "Devi inviare un numero compreso fra 1 e 40.\n"
-                                      "Riprova...")
+            update.message.reply_text(language["wrong_level"])
             user_data['choice'] = "level"
             return TYPING_REPLY
     elif category == "language":
-        update.message.reply_text("Ok! Ecco i dati che conosco:"
+        update.message.reply_text(language["text_ok"]
                                   "%s"
-                                  "Adesso conosco tutti i tuoi dati. Vuoi confermarli o cambiarli?"
+                                  language["ask_confirm"]
                                   % facts_to_str(user_data),
                                   reply_markup=confirm_markup)
         user_data['choice'] = "confirm"
         return CONFIRM
     elif category == "confirm":
-        if text == "Ricomincia":
+        if text == language["confirm_reply_keyboard"][0][1]:
             user_data.clear()
             #del user_data['username']
             #del user_data['level']
             #del user_data['team']
             user_data['choice'] = "username"
-            update.message.reply_text("Ok! Ho cancellato tutti i dati che mi hai inviato.\n"
-                                      "Ricominciamo!\n"
-                                      "Qual'e' il tuo nickname su Pokemon-Go?")
+            update.message.reply_text(language["text_restart"])
             return TYPING_REPLY
-        elif text == "Confermo":
+        elif text == language["confirm_reply_keyboard"][0][0]:
             ins = "INSERT OR IGNORE INTO USERS (ID,NAME,TEAM,LEVEL,FIRSTNAME,SURNAME,USERNAME,LANGUAGE) \
                    VALUES (%d, '%s', '%s', %d, '%s', '%s', '%s', %d );" % (update.message.chat_id, user_data['username'], \
                                                                            user_data['team'], int(user_data['level']), \
@@ -293,8 +287,7 @@ def received_information(bot, update, user_data):
             with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
                 language = json.load(language_file)
             build_custom_keyboards(language)
-            update.message.reply_text("Ok, ho salvato i tuoi dati nel database interno del bot!\n"
-                                      "Da ora puoi creare dei RAID o partecipare ai RAID che creano gli altri!",
+            update.message.reply_text(language["text_save"],
                                       reply_markup=raid_markup)
             del user_data['username']
             del user_data['level']
@@ -304,30 +297,30 @@ def received_information(bot, update, user_data):
             return RAID
                                       
         else:
-            update.message.reply_text("Non ho capito! Ecco i dati che conosco:"
+            update.message.reply_text(language["generic_error"]
                                       "%s"
-                                      "Adesso conosco tutti i tuoi dati. Vuoi confermarli o cambiarli?"
+                                      language["ask_confirm"]
                                       % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirm"
             return CONFIRM
     elif category == "raidboss":
         if not text in raidboss:
-            update.message.reply_text("Questo BOSS non esiste! Ripeti il nome del BOSS:",
+            update.message.reply_text(language["boss_unavailable"],
                                       reply_markup=raidboss_markup)
             user_data['choice'] = "raidboss"
             return TYPING_REPLY
         else:
-            update.message.reply_text("Ok! Ecco i dati che conosco:"
+            update.message.reply_text(language["text_ok"]
                                       "%s"
-                                      "Adesso ho bisogno di sapere la posizione. Inviami la posizione da Telegram:"
+                                      language["ask_location"]
                                       % facts_to_str(user_data),
                                       reply_markup=ReplyKeyboardRemove())
             user_data['choice'] = "position"
             return TYPING_LOCATION
     elif category == "position":
         if update.message.location == None:
-            update.message.reply_text("Non mi hai inviato una posizione! Inviami la posizione:",
+            update.message.reply_text(language["location_error"],
                                       reply_markup=ReplyKeyboardRemove())
             user_data['choice'] = "position"
             return TYPING_REPLY
