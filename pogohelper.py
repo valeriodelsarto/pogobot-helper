@@ -316,54 +316,43 @@ def received_information(bot, update, user_data):
             return TYPING_REPLY
         else:
             user_data[category] = str(update.message.location)
-            update.message.reply_text("Ok! Ecco i dati che conosco:"
-                                      "%s"
-                                      "Adesso ho bisogno di sapere la scadenza del RAID.\n"
-                                      "Dimmi fra quanto scade (all'incirca):\n"
-                                      "Per potersi organizzare, non e' possibile inserire RAID che scadono fra meno di 30 minuti"
+            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_expire"]
                                       % facts_to_str(user_data),
                                       reply_markup=raidbossexpire_markup)
             user_data['choice'] = "expire"
             return TYPING_REPLY
     elif category == "expire":
         if not text in raidbossexpire:
-            update.message.reply_text("Non mi hai risposto correttamente! Ripeti fra quanto scade il RAID:",
+            update.message.reply_text(language["raid_expire_error"],
                                       reply_markup=raidbossexpire_markup)
             user_data['choice'] = "expire"
             return TYPING_REPLY
         else:
-            update.message.reply_text("Ok! Ecco i dati che conosco:"
-                                      "%s"
-                                      "Ok, se lo sai scrivi il nome della palestra o un riferimento comprensibile su dove si trova:"
+            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_gym_text"]
                                       % facts_to_str(user_data),
                                       reply_markup=ReplyKeyboardRemove())
             user_data['choice'] = "gym"
             return TYPING_REPLY
     elif category == "gym":
-        if text != "Confermo":
-            update.message.reply_text("Ok! Ecco i dati che conosco:"
-                                      "%s"
-                                      "Confermi il nome o il riferimento assegnato alla palestra?\n"
-                                      "(Se vuoi cambiarlo riscrivilo altrimenti premi Confermo)"
+        if text != language["confirm_reply_keyboard"][0][0]:
+            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_gym_confirm"]
                                       % facts_to_str(user_data),
                                       reply_markup=confirmok_markup)
             user_data['choice'] = "gym"
             return TYPING_REPLY
         else:
-            update.message.reply_text("Ok! Ecco i dati che conosco:"
-                                      "%s"
-                                      "Adesso conosco tutti i dati del RAID. Vuoi confermarli o cambiarli?"
+            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_confirm"]
                                       % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirmraid"
             return CONFIRM
     elif category == "confirmraid":
-        if text == "Ricomincia":
+        if text == language["confirm_reply_keyboard"][0][1]:
             user_data.clear()
-            update.message.reply_text("Ok! Ho cancellato tutti i dati che mi hai inviato.",
+            update.message.reply_text(language["text_cancel"],
                                       reply_markup=raid_markup)
             return RAID
-        elif text == "Confermo":
+        elif text == language["confirm_reply_keyboard"][0][0]:
             pos = ast.literal_eval(user_data['position'])
             lat = pos['latitude']
             lon = pos['longitude']
@@ -379,15 +368,12 @@ def received_information(bot, update, user_data):
             # Close database connection
             conn.close()
 
-            update.message.reply_text("Ok, ho salvato i dati del RAID nel database interno del bot!\n"
-                                      "Ora puoi visualizzare il nuovo RAID nella lista!",
+            update.message.reply_text(language["raid_save"],
                                       reply_markup=raid_markup)
             return RAID
                                       
         else:
-            update.message.reply_text("Non ho capito! Ecco i dati che conosco:"
-                                      "%s"
-                                      "Adesso conosco tutti i dati del RAID. Vuoi confermarli o cambiarli?"
+            update.message.reply_text(language["generic_error"]+"\n%s\n"+language["raid_confirm"]
                                       % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirmraid"
