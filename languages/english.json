@@ -48,5 +48,17 @@
   "raid_info": "ID: %d,\nBoss: %s,\nExpire: %s,\nGym: %s,\nposition will follow:",
   "raid_info_createdby": "This RAID has been created by %s %s @%s",
   "raid_info_gymhuntr": "If you want to check the RAID presence please use the following link on GYMHUNTR: https://gymhuntr.com/#%f,%f",
-  "raid_empty": "There are no active RAIDs!"
+  "raid_empty": "There are no active RAIDs!",
+  "raid_edit": "Do you want to edit a RAID or go back to the main menu'?:",
+  "raid_create": "Send me the RAID data! First tell me the BOSS type:",
+  "raid_notifications_enabled": "RAID notifications enabled!",
+  "raid_notifications_already_enabled": "RAID notifications already enabled!",
+  "raid_notifications_already_disabled": "RAID notificatins already disabled!",
+  "raid_notifications_disabled": "RAID notifications disabled!",
+  "profile_modify": "Ok! Please tell me your profile data again. What is your Pokemon-Go nickname?",
+  "users_list": "Here is the list of registered users:",
+  "users_team": "Team",
+  "users_level": "Level",
+  "menu": "Ok! Going back to the main menu'.",
+  "raid_selected": "Ok! Selected RAID number %d with BOSS %s!"
 }
