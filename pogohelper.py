@@ -933,7 +933,7 @@ def main():
         regex_confirm += '|'.join(language_menu["confirm_reply_keyboard"][0])+'|'
         regex_yesno += '|'.join(language_menu["confirmyesno_reply_keyboard"][0])+'|'
         regex_menu += '|'.join(language_menu["raid_reply_keyboard"][0])+'|'
-        regex_raidfriends += language_menu["raid_friends_reply_keyboard"][0]+'|'
+        regex_raidfriends += language_menu["raid_friends_reply_keyboard"][0][0]+'|'
     regex_team = regex_team[:-1]
     regex_confirm = regex_confirm[:-1]
     regex_yesno = regex_yesno[:-1]
