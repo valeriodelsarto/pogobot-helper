@@ -211,17 +211,13 @@ def received_information(bot, update, user_data):
     #pprint.pprint(update.message.from_user)
 
     if category == "username":
-        update.message.reply_text(language["text_ok"]
-                                  "%s"
-                                  language["ask_team"]
+        update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_team"]
                                   % facts_to_str(user_data),
                                   reply_markup=team_markup)
         user_data['choice'] = "team"
         return TEAM
     elif category == "team":
-        update.message.reply_text(language["text_ok"]
-                                  "%s"
-                                  language["ask_level"]
+        update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_level"]
                                   % facts_to_str(user_data),
                                   reply_markup=ReplyKeyboardRemove())
         user_data['choice'] = "level"
@@ -244,9 +240,7 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "level"
             return TYPING_REPLY
     elif category == "language":
-        update.message.reply_text(language["text_ok"]
-                                  "%s"
-                                  language["ask_confirm"]
+        update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_confirm"]
                                   % facts_to_str(user_data),
                                   reply_markup=confirm_markup)
         user_data['choice'] = "confirm"
@@ -297,9 +291,7 @@ def received_information(bot, update, user_data):
             return RAID
                                       
         else:
-            update.message.reply_text(language["generic_error"]
-                                      "%s"
-                                      language["ask_confirm"]
+            update.message.reply_text(language["generic_error"]+"\n%s\n"+language["ask_confirm"]
                                       % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirm"
@@ -311,9 +303,7 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "raidboss"
             return TYPING_REPLY
         else:
-            update.message.reply_text(language["text_ok"]
-                                      "%s"
-                                      language["ask_location"]
+            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_location"]
                                       % facts_to_str(user_data),
                                       reply_markup=ReplyKeyboardRemove())
             user_data['choice'] = "position"
