@@ -60,5 +60,15 @@
   "users_team": "Team",
   "users_level": "Level",
   "menu": "Ok! Going back to the main menu'.",
-  "raid_selected": "Ok! Selected RAID number %d with BOSS %s!"
+  "raid_selected": "Ok! Selected RAID number %d with BOSS %s!",
+  "raid_no_attendees": "Right now there are no attendees at this RAID! Do you want to attend?",
+  "raid_enough_attendees": "*There are enough trainers that will attend in order to successfully defeat this BOSS! Perfect!*",
+  "raid_average_preferred_time": "The average time that were selected by all trainers is %s",
+  "raid_goodluck": ", let's meet at the Gym at the selected time and defeat this BOSS! Good Luck Trainers!",
+  "raid_confirm_attend": "You already attend at this RAID! Do you confirm your attendance?",
+  "raid_attend_question": "Right now you are not attending at this RAID! Do you want to attend?",
+  "raid_wrong": "You have selected an unexisting RAID! Going back to the main menu'",
+  "raid_notification_create": "A new RAID with ID %d and BOSS %s, expiring time %s has just been created by %s %s @%s, location follows:",
+  "raid_notification_enough_attendees": "The minimum number of attendees at RAID ID %d needed to successfully defeat the BOSS %s expiring time %s has been reached! The average time selected by all trainers is %s, let's meet at the Gym at this time and defeat this BOSS, Good Luck Trainers!",
+  "bot_restart": "This BOT has been restarted due to updates or maintenance, please click /start again in order to re-enable your notifications! Thank you for your patience!"
 }
