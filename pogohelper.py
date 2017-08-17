@@ -439,12 +439,10 @@ def received_information(bot, update, user_data):
                             ora = str(datetime.now().strftime('%H:%M'))
                             tempo_preferito = str(datetime.strptime(row[2],'%Y-%m-%d %H:%M:%S').strftime('%H:%M'))
                             if row[0] == update.message.chat_id:
-                                update.message.reply_text("A questo RAID partecipi anche te!",
+                                update.message.reply_text(language["raid_attend_you"],
                                                           reply_markup=ReplyKeyboardRemove())
                             else:
-                                update.message.reply_text("A questo RAID partecipa anche %s!\n"
-                                                          "E' un livello %d e appartiene al Team %s\n"
-                                                          "L'orario a cui preferisce partecipare al RAID e': %s"
+                                update.message.reply_text(language["raid_attend_another"]
                                                           % (row2[0], int(row2[2]), row2[1], tempo_preferito),
                                                           reply_markup=ReplyKeyboardRemove())
                             
@@ -454,43 +452,32 @@ def received_information(bot, update, user_data):
                                 else:
                                     dict_preferred_time[tempo_preferito] = 1
                             if row[1] > 0:
-                                update.message.reply_text("%s ha anche %d amici che partecipano!"
+                                update.message.reply_text(language["raid_attend_another_friends"]
                                                           % (row2[0],row[1]))
                                 totpartecipanti += row[1]
                                 totamici += row[1]
                                 dict_preferred_time[tempo_preferito] += row[1]
                         totpartecipanti += 1
-                    preferred_time = "Gli orari preferiti per il RAID sono (con i relativi partecipanti):\n"
+                    preferred_time = language["raid_preferred_time"]
                     for key, value in dict_preferred_time.items():
-                        preferred_time += "Ore "+str(key)+" Partecipanti "+str(value)+"\n"
+                        preferred_time += language["hours"]+" "+str(key)+" "+language["attendees"]+" "+str(value)+"\n"
                     preferred_time = preferred_time[:-1]
-                    update.message.reply_text("Per ora ci sono %d partecipanti a questo RAID!\n"
-                                              "Ci sono %d del team Istinto-Giallo\n"
-                                              "Ci sono %d del team Saggezza-Blu\n"
-                                              "Ci sono %d del team Coraggio-Rosso\n"
-                                              "Ci sono %d livelli 40\n"
-                                              "Ci sono %d livelli 35 o superiore\n"
-                                              "Ci sono %d livelli 30 o superiore\n"
-                                              "Ci sono %d amici che partecipano\n"
-                                              "%s\n"
-                                              "Il tuo orario preferito non e' ancora inserito, te lo chiedero' fra poco."
+                    update.message.reply_text(language["raid_final_info"]+"\n%s\n"+language["raid_ask_preferred_time_later"]
                                               % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, totover30, \
                                               totamici, preferred_time),
                                               reply_markup=ReplyKeyboardRemove())
                     conn.close()
-                    update.message.reply_text("Ok! Ora dimmi se ci sono degli amici con te che parteciperanno\n"
-                                              "e non hanno Telegram quindi non possono registrarsi in questo RAID:",
+                    update.message.reply_text(language["raid_friends"],
                                               reply_markup=raid_friends_markup)
                     user_data['choice'] = "confirmraidattend_friends"
                     return RAIDFRIENDS
             else:
-                update.message.reply_text("Ok! Presenza confermata, Torno al menu' principale!",
+                update.message.reply_text(language["raid_attend_confirm"],
                                           reply_markup=raid_markup)
                 user_data.clear()
                 return RAID
         else:
-            update.message.reply_text("Non ho capito!\n"
-                                      "Vuoi partecipare a questo RAID?",
+            update.message.reply_text(language["raid_confirm_error"],
                                       reply_markup=confirmyesno_markup)
             user_data['raidid'] = user_data['raidid']
             user_data['choice'] = "confirmraidattend"
@@ -510,7 +497,7 @@ def received_information(bot, update, user_data):
                 orario = orario + timedelta(minutes=15)
             raid_preferredtime_reply_keyboard = [KeyboardButton(s) for s in pulsanti]
             raid_preferredtime_markup = ReplyKeyboardMarkup(build_menu(raid_preferredtime_reply_keyboard, n_cols=4))
-            update.message.reply_text("Ok! Ora dimmi l'orario a cui preferisci partecipare a questo RAID:",
+            update.message.reply_text(language["raid_ask_preferred_time"],
                                       reply_markup=raid_preferredtime_markup)
             user_data['choice'] = "confirmraidattend_preferredtime"
             return RAIDPREFERREDTIME
@@ -528,7 +515,7 @@ def received_information(bot, update, user_data):
                 orario = orario + timedelta(minutes=15)
             raid_preferredtime_reply_keyboard = [KeyboardButton(s) for s in pulsanti]
             raid_preferredtime_markup = ReplyKeyboardMarkup(build_menu(raid_preferredtime_reply_keyboard, n_cols=4))
-            update.message.reply_text("Ok! Ora dimmi l'orario a cui preferisci partecipare a questo RAID:",
+            update.message.reply_text(language["raid_ask_preferred_time"],
                                       reply_markup=raid_preferredtime_markup)
             user_data['choice'] = "confirmraidattend_preferredtime"
             return RAIDPREFERREDTIME
@@ -540,7 +527,7 @@ def received_information(bot, update, user_data):
         conn.execute(upd)
         conn.commit()
         conn.close()
-        update.message.reply_text("Ok! Dati salvati! Ritorno al menu' principale.",
+        update.message.reply_text(language["saved_data"],
                                   reply_markup=raid_markup)
         user_data.clear()
         return RAID
@@ -550,9 +537,7 @@ def received_information(bot, update, user_data):
         #del user_data['level']
         #del user_data['team']
         user_data['choice'] = "username"
-        update.message.reply_text("Non ho capito!\n"
-                                  "Ricominciamo!\n"
-                                  "Qual'e' il tuo nickname su Pokemon-Go?",
+        update.message.reply_text(language["text_restart_error"],
                                   reply_markup=ReplyKeyboardRemove())
         return TYPING_REPLY
 
