@@ -380,19 +380,19 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "confirmraid"
             return CONFIRM
     elif category == "confirmraidattend":
-        if text == "No":
+        if text == language[confirmyesno_reply_keyboard][0][1]:
             delete = "DELETE FROM RAIDPLAYERS WHERE RAIDID = %d AND PLAYERID = %d;" % (int(user_data['raidid']), \
                                                                                        update.message.chat_id)
             conn = sqlite3.connect('pogohelper.db')
             conn.execute(delete)
             conn.commit()
             conn.close()
-            update.message.reply_text("Ok! Ho eliminato la tua partecipazione dal RAID numero %d!"
+            update.message.reply_text(language["raid_remove_attend"]
                                       % (int(user_data['raidid'])),
                                       reply_markup=raid_markup)
             user_data.clear()
             return RAID
-        elif text == "Si":
+        elif text == language[confirmyesno_reply_keyboard][0][0]:
             if 'firstattend' in user_data:
                 if user_data['firstattend']:
                     sel = "SELECT ID FROM RAIDPLAYERS WHERE RAIDID = %d AND PLAYERID = %d;" % (int(user_data['raidid']),update.message.chat_id)
@@ -405,8 +405,7 @@ def received_information(bot, update, user_data):
                         ins = "INSERT INTO RAIDPLAYERS (RAIDID,PLAYERID) VALUES (%d, %d);" % (int(user_data['raidid']),update.message.chat_id)
                         conn.execute(ins)
                         conn.commit()
-                    update.message.reply_text("Ok, ho salvato la tua partecipazione a questo RAID nel database interno del bot!\n"
-                                              "Ecco la lista aggiornata dei partecipanti a questo RAID:",
+                    update.message.reply_text(language["raid_add_attend"],
                                               reply_markup=ReplyKeyboardRemove())
                     sel = "SELECT DISTINCT(PLAYERID),FRIENDS,PREFERRED_TIME FROM RAIDPLAYERS WHERE RAIDID = %d;" % (int(user_data['raidid']))
                     cursor = conn.execute(sel)
@@ -424,11 +423,11 @@ def received_information(bot, update, user_data):
                         sel2 = "SELECT NAME,TEAM,LEVEL FROM USERS WHERE ID = %d;" % (row[0])
                         cursor2 = conn.execute(sel2)
                         for row2 in cursor2:
-                            if row2[1] == "Istinto-Giallo":
+                            if row2[1] == language["team_reply_keyboard"][0][0]:
                                 totgialli += 1
-                            elif row2[1] == "Saggezza-Blu":
+                            elif row2[1] == language["team_reply_keyboard"][0][1]:
                                 totblu += 1
-                            elif row2[1] == "Coraggio-Rosso":
+                            elif row2[1] == language["team_reply_keyboard"][0][2]:
                                 totrossi += 1
                             if row2[2] >= 40:
                                 tot40 += 1
