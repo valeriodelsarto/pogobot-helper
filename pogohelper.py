@@ -163,6 +163,7 @@ def start(bot, update, job_queue, user_data):
         sel = "SELECT NAME,LANGUAGE FROM USERS WHERE ID = %d;" % (update.message.chat_id)
         cursor = conn.execute(sel)
         present = 0
+        default_language = 2 # it will be changed in the next cycle
         for row in cursor:
             name = row[0]
             present = 1
