@@ -20,9 +20,9 @@ $ git clone https://github.com/valeriodelsarto/pogobot-helper.git
 $ cd pogobot-helper
 $ ./init.sh
 $ cp token_id.example token_id
-$ vim token_id (insert your personal Telegram BOT Token here)
+$ vi token_id (insert your personal Telegram BOT Token here)
 $ cp admins.txt.example admins.txt
-$ vim admins.txt (insert only your(s) Telegram ID(s) here)
+$ vi admins.txt (insert only your(s) Telegram ID(s) here)
 $ ./startup.sh
 ```
 
@@ -41,6 +41,7 @@ Some useful files included in this repo and their meanings (authorized.json righ
 | startup.sh | a BASH script that starts GNU Screen with launch.sh (include this script into /etc/rc.local) |
 | token_id | a TEXT file that contains your personal Telegram BOT TOKEN |
 | admins.txt | a TEXT file that contains IDs of Telegram users that can restart your bot |
+| languages/*.json | JSON files that contains the localizations of the BOT in different languages |
 
 authorized.json, blocked.json, token_id and admins.txt files are provided with .example extension, copy and modify them as needed. 
 
@@ -48,9 +49,13 @@ authorized.json, blocked.json, token_id and admins.txt files are provided with .
 
 Want to contribute? Great! [Fork my repo, apply your changes and open me a PR](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)!
 
+### Translations
+
+If you want to help me adding support for your language into this BOT, please make a copy of languages/english.json and translate the value of every row, then send me a PR or directly the new JSON file! Thanks!
+
 ### Todos
 
- - Add BOT localization to have UI text in any language!
+ - To be defined!
 
 License
 ----
