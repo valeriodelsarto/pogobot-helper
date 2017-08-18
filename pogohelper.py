@@ -90,6 +90,7 @@ def build_custom_keyboards():
     global confirmyesno_markup
     global raid_markup
     global raidboss_markup
+    global raidbossexpire
     global raidbossexpire_markup
     global sqlexpire
     global raid_friends_markup
@@ -204,6 +205,7 @@ def start(bot, update, job_queue, user_data):
 
 def received_information(bot, update, user_data):
     global language
+    global raidbossexpire
     if not 'choice' in user_data:
         user_data['choice'] = "username"
     text = update.message.text
@@ -382,7 +384,7 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "confirmraid"
             return CONFIRM
     elif category == "confirmraidattend":
-        if text == language[confirmyesno_reply_keyboard][1][0]:
+        if text == language["confirmyesno_reply_keyboard"][1][0]:
             delete = "DELETE FROM RAIDPLAYERS WHERE RAIDID = %d AND PLAYERID = %d;" % (int(user_data['raidid']), \
                                                                                        update.message.chat_id)
             conn = sqlite3.connect('pogohelper.db')
@@ -394,7 +396,7 @@ def received_information(bot, update, user_data):
                                       reply_markup=raid_markup)
             user_data.clear()
             return RAID
-        elif text == language[confirmyesno_reply_keyboard][0][0]:
+        elif text == language["confirmyesno_reply_keyboard"][0][0]:
             if 'firstattend' in user_data:
                 if user_data['firstattend']:
                     sel = "SELECT ID FROM RAIDPLAYERS WHERE RAIDID = %d AND PLAYERID = %d;" % (int(user_data['raidid']),update.message.chat_id)
@@ -676,7 +678,7 @@ def raidedit_management(bot, update, user_data):
         presente = False
         conn = sqlite3.connect('pogohelper.db')
         sel = "SELECT RAID.CREATED_BY,RAID.BOSS,RAID.LAT,RAID.LONG,RAID.TIME,RAID.GYM,RAIDBOSS.STRENGTH \
-               FROM RAID LEFT JOIN RAIDBOSS ON RAID.BOSS = RAIDBOSS.BOSS WHERE ID = %d;" % (int(text))
+               FROM RAID LEFT JOIN RAIDBOSS ON RAID.BOSS = RAIDBOSS.BOSS WHERE RAID.ID = %d;" % (int(text))
         cursor = conn.execute(sel)
         for row in cursor:
             presente = True
@@ -717,7 +719,7 @@ def raidedit_management(bot, update, user_data):
                         totover35 += 1
                     elif row2[2] >= 30:
                         totover30 += 1
-                    raidteamstrength += float(row[2])/30
+                    raidteamstrength += float(row2[2])/30
                         
                     tempo_preferito = str(datetime.strptime(row[2],'%Y-%m-%d %H:%M:%S').strftime('%H:%M'))
                     if row[0] == update.message.chat_id:
