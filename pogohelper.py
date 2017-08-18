@@ -16,7 +16,7 @@ import ast
 import re
 
 # Default language
-default_language = 2 # 1 - English, 2 - Italian, 3 - Dutch
+default_language = 1 # 1 - English, 2 - Italian, 3 - Dutch
 
 # Admins that are enabled to restart the bot with /r command
 LIST_OF_ADMINS = []
@@ -163,7 +163,7 @@ def start(bot, update, job_queue, user_data):
         sel = "SELECT NAME,LANGUAGE FROM USERS WHERE ID = %d;" % (update.message.chat_id)
         cursor = conn.execute(sel)
         present = 0
-        default_language = 2 # it will be changed in the next cycle
+        default_language = 1 # it will be changed in the next cycle
         for row in cursor:
             name = row[0]
             present = 1
