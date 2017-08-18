@@ -172,6 +172,7 @@ def start(bot, update, job_queue, user_data):
         conn.close()
 
         # Load language file
+        global language
         with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
             language = json.load(language_file)
         build_custom_keyboards(language)
