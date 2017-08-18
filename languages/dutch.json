@@ -8,7 +8,7 @@
   "raidbossexpire_reply_keyboard": [["30 min"],["45 min"],["1 uur"],["1 uur and 15 min"],["1 uur and 30 min"],["1 uur and 45 min"],["2 uur"]],
   "raid_friends_reply_keyboard": [["Niemand"],["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],
   "welcome1": "Welkom %s!",
-  "welcome2": "Hi! Deze bot helpt met het organiseren van Pokemon-Go RAID Battles.\nIk heb wat informatie nodig. Wat is jouw Pokemon-Go nickname?"
+  "welcome2": "Hi! Deze bot helpt met het organiseren van Pokemon-Go RAID Battles.\nIk heb wat informatie nodig. Wat is jouw Pokemon-Go nickname?",
   "text_ok": "Ok! Dit is wat ik al weet:",
   "ask_team": "Nu wil ik weten van welk Team je bent:",
   "ask_level": "Nu wil ik weten welk level je bent:",
