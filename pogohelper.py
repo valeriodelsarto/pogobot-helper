@@ -82,7 +82,7 @@ conn.close()
 TEAM, CONFIRM, CONFIRMYESNO, RAID, RAIDEDIT, RAIDFRIENDS, RAIDPREFERREDTIME, USERLANGUAGE, TYPING_REPLY, TYPING_LOCATION = range(10)
 
 # Custom reply keyboards
-def build_custom_keyboards(language):
+def build_custom_keyboards():
     # Build custom keyboars with selected language
     global team_markup
     global confirm_markup
@@ -175,7 +175,7 @@ def start(bot, update, job_queue, user_data):
         global language
         with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
             language = json.load(language_file)
-        build_custom_keyboards(language)
+        build_custom_keyboards()
 
         # if a user is already registered
         if present == 1:
@@ -203,6 +203,7 @@ def start(bot, update, job_queue, user_data):
 
 
 def received_information(bot, update, user_data):
+    global language
     if not 'choice' in user_data:
         user_data['choice'] = "username"
     text = update.message.text
@@ -213,14 +214,14 @@ def received_information(bot, update, user_data):
     #pprint.pprint(update.message.from_user)
 
     if category == "username":
-        update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_team"]
-                                  % facts_to_str(user_data),
+        answer = language["text_ok"]+"\n%s\n"+language["ask_team"]
+        update.message.reply_text(answer % facts_to_str(user_data),
                                   reply_markup=team_markup)
         user_data['choice'] = "team"
         return TEAM
     elif category == "team":
-        update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_level"]
-                                  % facts_to_str(user_data),
+        answer = language["text_ok"]+"\n%s\n"+language["ask_level"]
+        update.message.reply_text(answer % facts_to_str(user_data),
                                   reply_markup=ReplyKeyboardRemove())
         user_data['choice'] = "level"
         return TYPING_REPLY
@@ -242,13 +243,13 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "level"
             return TYPING_REPLY
     elif category == "language":
-        update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_confirm"]
-                                  % facts_to_str(user_data),
+        answer = language["text_ok"]+"\n%s\n"+language["ask_confirm"]
+        update.message.reply_text(answer % facts_to_str(user_data),
                                   reply_markup=confirm_markup)
         user_data['choice'] = "confirm"
         return CONFIRM
     elif category == "confirm":
-        if text == language["confirm_reply_keyboard"][0][1]:
+        if text == language["confirm_reply_keyboard"][1][0]:
             user_data.clear()
             #del user_data['username']
             #del user_data['level']
@@ -282,7 +283,7 @@ def received_information(bot, update, user_data):
             # Load language file
             with open('languages/'+str(languages[languages_id.index(default_language)]).lower()+'.json') as language_file:
                 language = json.load(language_file)
-            build_custom_keyboards(language)
+            build_custom_keyboards()
             update.message.reply_text(language["text_save"],
                                       reply_markup=raid_markup)
             del user_data['username']
@@ -293,8 +294,8 @@ def received_information(bot, update, user_data):
             return RAID
                                       
         else:
-            update.message.reply_text(language["generic_error"]+"\n%s\n"+language["ask_confirm"]
-                                      % facts_to_str(user_data),
+            answer = language["generic_error"]+"\n%s\n"+language["ask_confirm"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirm"
             return CONFIRM
@@ -305,8 +306,8 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "raidboss"
             return TYPING_REPLY
         else:
-            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["ask_location"]
-                                      % facts_to_str(user_data),
+            answer = language["text_ok"]+"\n%s\n"+language["ask_location"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=ReplyKeyboardRemove())
             user_data['choice'] = "position"
             return TYPING_LOCATION
@@ -318,8 +319,8 @@ def received_information(bot, update, user_data):
             return TYPING_REPLY
         else:
             user_data[category] = str(update.message.location)
-            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_expire"]
-                                      % facts_to_str(user_data),
+            answer = language["text_ok"]+"\n%s\n"+language["raid_expire"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=raidbossexpire_markup)
             user_data['choice'] = "expire"
             return TYPING_REPLY
@@ -330,26 +331,26 @@ def received_information(bot, update, user_data):
             user_data['choice'] = "expire"
             return TYPING_REPLY
         else:
-            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_gym_text"]
-                                      % facts_to_str(user_data),
+            answer = language["text_ok"]+"\n%s\n"+language["raid_gym_text"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=ReplyKeyboardRemove())
             user_data['choice'] = "gym"
             return TYPING_REPLY
     elif category == "gym":
         if text != language["confirm_reply_keyboard"][0][0]:
-            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_gym_confirm"]
-                                      % facts_to_str(user_data),
+            answer = language["text_ok"]+"\n%s\n"+language["raid_gym_confirm"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=confirmok_markup)
             user_data['choice'] = "gym"
             return TYPING_REPLY
         else:
-            update.message.reply_text(language["text_ok"]+"\n%s\n"+language["raid_confirm"]
-                                      % facts_to_str(user_data),
+            answer = language["text_ok"]+"\n%s\n"+language["raid_confirm"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirmraid"
             return CONFIRM
     elif category == "confirmraid":
-        if text == language["confirm_reply_keyboard"][0][1]:
+        if text == language["confirm_reply_keyboard"][1][0]:
             user_data.clear()
             update.message.reply_text(language["text_cancel"],
                                       reply_markup=raid_markup)
@@ -375,13 +376,13 @@ def received_information(bot, update, user_data):
             return RAID
                                       
         else:
-            update.message.reply_text(language["generic_error"]+"\n%s\n"+language["raid_confirm"]
-                                      % facts_to_str(user_data),
+            answer = language["generic_error"]+"\n%s\n"+language["raid_confirm"]
+            update.message.reply_text(answer % facts_to_str(user_data),
                                       reply_markup=confirm_markup)
             user_data['choice'] = "confirmraid"
             return CONFIRM
     elif category == "confirmraidattend":
-        if text == language[confirmyesno_reply_keyboard][0][1]:
+        if text == language[confirmyesno_reply_keyboard][1][0]:
             delete = "DELETE FROM RAIDPLAYERS WHERE RAIDID = %d AND PLAYERID = %d;" % (int(user_data['raidid']), \
                                                                                        update.message.chat_id)
             conn = sqlite3.connect('pogohelper.db')
@@ -426,9 +427,9 @@ def received_information(bot, update, user_data):
                         for row2 in cursor2:
                             if row2[1] == language["team_reply_keyboard"][0][0]:
                                 totgialli += 1
-                            elif row2[1] == language["team_reply_keyboard"][0][1]:
+                            elif row2[1] == language["team_reply_keyboard"][1][0]:
                                 totblu += 1
-                            elif row2[1] == language["team_reply_keyboard"][0][2]:
+                            elif row2[1] == language["team_reply_keyboard"][2][0]:
                                 totrossi += 1
                             if row2[2] >= 40:
                                 tot40 += 1
@@ -463,9 +464,9 @@ def received_information(bot, update, user_data):
                     for key, value in dict_preferred_time.items():
                         preferred_time += language["hours"]+" "+str(key)+" "+language["attendees"]+" "+str(value)+"\n"
                     preferred_time = preferred_time[:-1]
-                    update.message.reply_text(language["raid_final_info"]+"\n%s\n"+language["raid_ask_preferred_time_later"]
-                                              % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, totover30, \
-                                              totamici, preferred_time),
+                    answer = language["raid_final_info"]+"\n%s\n"+language["raid_ask_preferred_time_later"]
+                    update.message.reply_text(answer % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, \
+                                              totover30, totamici, preferred_time),
                                               reply_markup=ReplyKeyboardRemove())
                     conn.close()
                     update.message.reply_text(language["raid_friends"],
@@ -599,12 +600,12 @@ def raid_management(bot, update, job_queue, user_data):
             conn.close()
             return RAIDEDIT
         
-    elif text == language["raid_reply_keyboard"][0][1]:
+    elif text == language["raid_reply_keyboard"][1][0]:
         update.message.reply_text(language["raid_create"],
                                   reply_markup=raidboss_markup)
         user_data['choice'] = "raidboss"
         return TYPING_REPLY
-    elif text == language["raid_reply_keyboard"][0][3]:
+    elif text == language["raid_reply_keyboard"][3][0]:
         if 'job_notifications' not in user_data:
             # Add job to queue
             job = job_queue.run_repeating(notify_raids, 60, context=update.message.chat_id)
@@ -621,7 +622,7 @@ def raid_management(bot, update, job_queue, user_data):
             update.message.reply_text(language["raid_notifications_already_enabled"],
                                       reply_markup=raid_markup)
             return RAID
-    elif text == language["raid_reply_keyboard"][0][4]:
+    elif text == language["raid_reply_keyboard"][4][0]:
         if 'job_notifications' not in user_data:
             update.message.reply_text(language["raid_notifications_already_disabled"],
                                       reply_markup=raid_markup)
@@ -639,20 +640,20 @@ def raid_management(bot, update, job_queue, user_data):
             update.message.reply_text(language["raid_notifications_disabled"],
                                       reply_markup=raid_markup)
             return RAID
-    elif text == language["raid_reply_keyboard"][0][5]:
+    elif text == language["raid_reply_keyboard"][5][0]:
         if 'username' in user_data:
             del user_data['username']
         if 'level' in user_data:
             del user_data['level']
         if 'team' in user_data:
             del user_data['team']
-        if 'language' in user_data:
-            del user_data['language']
+        #if 'language' in user_data:
+        #    del user_data['language']
         user_data['choice'] = "username"
         update.message.reply_text(language["profile_modify"])
         return TYPING_REPLY
-    elif text == language["raid_reply_keyboard"][0][2]:
-        utenti_registrati = language["users_list"]
+    elif text == language["raid_reply_keyboard"][2][0]:
+        utenti_registrati = language["users_list"]+"\n"
         sel = "SELECT NAME,TEAM,LEVEL FROM USERS ORDER BY LEVEL DESC;"
         conn = sqlite3.connect('pogohelper.db')
         cursor = conn.execute(sel)
@@ -706,9 +707,9 @@ def raidedit_management(bot, update, user_data):
                 for row2 in cursor2:
                     if row2[1] == language["team_reply_keyboard"][0][0]:
                         totgialli += 1
-                    elif row2[1] == language["team_reply_keyboard"][0][1]:
+                    elif row2[1] == language["team_reply_keyboard"][1][0]:
                         totblu += 1
-                    elif row2[1] == language["team_reply_keyboard"][0][2]:
+                    elif row2[1] == language["team_reply_keyboard"][2][0]:
                         totrossi += 1
                     if row2[2] >= 40:
                         tot40 += 1
@@ -761,9 +762,9 @@ def raidedit_management(bot, update, user_data):
                 preferred_time += language["raid_average_preferred_time"] % (tempo_medio)
                 if raidteamstrength > raidbossstrength:
                     preferred_time += language["raid_goodluck"]
-                update.message.reply_text(language["raid_final_info"]+"\n%s"
-                                          % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, totover30, \
-                                          totamici, preferred_time),
+                answer = language["raid_final_info"]+"\n%s"
+                update.message.reply_text(answer % (totpartecipanti, totgialli, totblu, totrossi, tot40, totover35, \
+                                          totover30, totamici, preferred_time),
                                           reply_markup=ReplyKeyboardRemove(), parse_mode=ParseMode.MARKDOWN)
                 if partecipo:
                     update.message.reply_text(language["raid_confirm_attend"],
@@ -866,11 +867,16 @@ def main():
     for language_text in languages:
         with open('languages/'+language_text.lower()+'.json') as language_file_menu:
             language_menu = json.load(language_file_menu)
-        regex_team += '|'.join(language_menu["team_reply_keyboard"][0])+'|'
-        regex_confirm += '|'.join(language_menu["confirm_reply_keyboard"][0])+'|'
-        regex_yesno += '|'.join(language_menu["confirmyesno_reply_keyboard"][0])+'|'
-        regex_menu += '|'.join(language_menu["raid_reply_keyboard"][0])+'|'
-        regex_raidfriends += language_menu["raid_friends_reply_keyboard"][0][0]+'|'
+            for item in language_menu["team_reply_keyboard"]:
+                regex_team += item[0]+'|'
+            for item in language_menu["confirm_reply_keyboard"]:
+                regex_confirm += item[0]+'|'
+            for item in language_menu["confirmyesno_reply_keyboard"]:
+                regex_yesno += item[0]+'|'
+            for item in language_menu["raid_reply_keyboard"]:
+                regex_menu += item[0]+'|'
+            for item in language_menu["raid_friends_reply_keyboard"][0]:
+                regex_raidfriends += item+'|'
     regex_team = regex_team[:-1]
     regex_confirm = regex_confirm[:-1]
     regex_yesno = regex_yesno[:-1]
