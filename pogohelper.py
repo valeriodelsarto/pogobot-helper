@@ -43,7 +43,9 @@ def ceil_dt(dt, delta):
     return dt + (datetime.min - dt) % delta
 
 # Enable logs
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+logfile = "log/"+os.path.splitext(os.path.basename(__file__))[0]+".log"
+logging.basicConfig(filename=logfile,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
