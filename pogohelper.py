@@ -560,6 +560,7 @@ def done(bot, update, user_data):
 
 
 def raid_management(bot, update, job_queue, user_data):
+    global language
     text = update.message.text
     if text == language["raid_reply_keyboard"][0][0]:
         if 'job_delete_old_raids' not in user_data:
@@ -671,6 +672,7 @@ def raid_management(bot, update, job_queue, user_data):
 
 
 def raidedit_management(bot, update, user_data):
+    global language
     text = update.message.text
     if text == "Menu":
         update.message.reply_text(language["menu"],
@@ -804,6 +806,7 @@ def delete_old_raids(bot, job):
 
 
 def notify_raids(bot, job):
+    global language
     sel = "SELECT RAID.ID,RAID.BOSS,USERS.FIRSTNAME,USERS.SURNAME,USERS.USERNAME,RAID.LAT,RAID.LONG,RAID.TIME,RAID.READY \
            FROM RAID LEFT JOIN USERS ON RAID.CREATED_BY = USERS.ID WHERE RAID.CREATED_BY != %d ORDER BY RAID.ID;" \
            % (job.context)
@@ -846,6 +849,7 @@ def notify_raids(bot, job):
 
 
 def botShutdown():
+    global language
     bot = telegram.Bot(token_id.strip())
     sel = "SELECT ID FROM USERS WHERE NOTIFICATIONS = 1;"
     conn = sqlite3.connect('pogohelper.db')
@@ -969,7 +973,7 @@ def main():
     updater.idle()
 
     # Send shutdown notifications
-    #botShutdown()
+    botShutdown()
 
 
 if __name__ == '__main__':
