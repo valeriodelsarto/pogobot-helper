@@ -9,7 +9,7 @@ It uses [GNU Screen](https://www.gnu.org/software/screen/) to launch itself with
 ### Installation
 
 * Clone this GitHub repo!
-* Install dependencies (if needed)
+* Install dependencies (if needed, like python3, pip3, virtualenv, python-telegram-bot, screen)
 * Create a local Python Virtual Environment (suggested) (step included into init.sh script file)
 * Create the local SQLite database from the provided SQL schema file (step included into init.sh script file)
 * Get a custom BOT TOKEN from Telegram [@BotFather](https://core.telegram.org/bots#6-botfather)
@@ -25,6 +25,7 @@ $ cp admins.txt.example admins.txt
 $ vi admins.txt (insert only your(s) Telegram ID(s) here)
 $ ./startup.sh
 ```
+(if you want you can insert the startup.sh script into your /etc/rc.local so this BOT will automatically start at every boot)
 
 ### Things to know
 
