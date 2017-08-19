@@ -25,7 +25,7 @@ $ ./init.sh
 $ cp token_id.example token_id
 $ vi token_id (insert your personal Telegram BOT Token here)
 $ cp admins.txt.example admins.txt
-$ vi admins.txt (insert only your(s) Telegram ID(s) here)
+$ vi admins.txt (insert only your(s) Telegram ID(s) here, one per line)
 $ ./startup.sh
 ```
 (if you want you can insert the startup.sh script into your /etc/rc.local so this BOT will automatically start at every boot)
