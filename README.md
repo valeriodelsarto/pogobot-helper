@@ -42,8 +42,13 @@ Some useful files included in this repo and their meanings (authorized.json righ
 | token_id | a TEXT file that contains your personal Telegram BOT TOKEN |
 | admins.txt | a TEXT file that contains IDs of Telegram users that can restart your bot |
 | languages/*.json | JSON files that contains the localizations of the BOT in different languages |
+| log/pogohelper.log | a text file that contains the BOT log, here you can find any error text |
 
 authorized.json, blocked.json, token_id and admins.txt files are provided with .example extension, copy and modify them as needed. 
+
+### Need Help?
+
+Please [open a new issue](https://github.com/valeriodelsarto/pogobot-helper/issues/new) and don't forget to report the content of the log file *log/pogohelper.log* so I'll be able to help!
 
 ### Development
 
