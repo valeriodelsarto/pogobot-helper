@@ -48,7 +48,7 @@ authorized.json, blocked.json, token_id and admins.txt files are provided with .
 
 ### Need Help?
 
-Please [open a new issue](https://github.com/valeriodelsarto/pogobot-helper/issues/new) and don't forget to report the content of the log file *log/pogohelper.log* so I'll be able to help!
+Please [open a new issue](https://github.com/valeriodelsarto/pogobot-helper/issues/new) and don't forget to report the content of the log file **log/pogohelper.log** so I'll be able to help!
 
 ### Development
 
